@@ -68,7 +68,11 @@ export class PromptBlock extends BasePromptBlock<PromptTemplateBlockExcludingFun
       classArgs.push(
         new MethodArgument({
           name: "template",
-          value: python.TypeInstantiation.str(promptBlock.properties.template),
+          value: python.TypeInstantiation.str(promptBlock.properties.template, {
+            multiline: true,
+            startOnNewLine: true,
+            endWithNewLine: true,
+          }),
         })
       );
     }
@@ -206,7 +210,11 @@ export class PromptBlock extends BasePromptBlock<PromptTemplateBlockExcludingFun
     classArgs.push(
       new MethodArgument({
         name: "text",
-        value: python.TypeInstantiation.str(promptBlock.text),
+        value: python.TypeInstantiation.str(promptBlock.text, {
+          multiline: true,
+          startOnNewLine: true,
+          endWithNewLine: true,
+        }),
       })
     );
 

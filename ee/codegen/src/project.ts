@@ -66,6 +66,15 @@ import {
 import { getNodeId } from "src/utils/nodes";
 import { assertUnreachable } from "src/utils/typing";
 
+export interface WorkflowProjectGeneratorOptions {
+  /**
+   * Used to override the default codegen behavior for Code Execution Nodes. If set to "STANDALONE",
+   *  the node's code will be generated in a separate file. If set to "INLINE", the node's code will
+   *  be inlined as a node attribute.
+   */
+  codeExecutionNodeCodeRepresentationOverride?: "STANDALONE" | "INLINE";
+}
+
 export declare namespace WorkflowProjectGenerator {
   interface BaseArgs {
     moduleName: string;
@@ -77,6 +86,7 @@ export declare namespace WorkflowProjectGenerator {
     workflowsSdkModulePath?: readonly string[];
     workflowVersionExecConfigData: unknown;
     vellumApiKey?: string;
+    options?: WorkflowProjectGeneratorOptions;
   }
 
   interface NestedProject extends BaseArgs {
@@ -144,6 +154,8 @@ ${errors.slice(0, 3).map((err) => {
         vellumApiKey,
         workflowRawEdges: rawEdges,
         strict: rest.strict,
+        codeExecutionNodeCodeRepresentationOverride:
+          rest.options?.codeExecutionNodeCodeRepresentationOverride,
       });
     }
   }

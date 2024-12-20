@@ -35,6 +35,7 @@ export declare namespace WorkflowContext {
     vellumApiKey: string;
     workflowRawEdges: WorkflowEdge[];
     strict?: boolean;
+    codeExecutionNodeCodeRepresentationOverride?: "STANDALONE" | "INLINE";
   };
 }
 
@@ -91,6 +92,11 @@ export class WorkflowContext {
 
   public readonly workflowRawEdges: WorkflowEdge[];
 
+  public readonly codeExecutionNodeCodeRepresentationOverride:
+    | "STANDALONE"
+    | "INLINE"
+    | undefined;
+
   constructor({
     absolutePathToOutputDirectory,
     moduleName,
@@ -103,6 +109,7 @@ export class WorkflowContext {
     vellumApiKey,
     workflowRawEdges,
     strict = false,
+    codeExecutionNodeCodeRepresentationOverride,
   }: WorkflowContext.Args) {
     this.absolutePathToOutputDirectory = absolutePathToOutputDirectory;
     this.moduleName = moduleName;
@@ -128,8 +135,12 @@ export class WorkflowContext {
 
     this.sdkModulePathNames = generateSdkModulePaths(workflowsSdkModulePath);
     this.workflowRawEdges = workflowRawEdges;
+
     this.strict = strict;
     this.errors = [];
+
+    this.codeExecutionNodeCodeRepresentationOverride =
+      codeExecutionNodeCodeRepresentationOverride;
   }
 
   /* Create a new workflow context for a nested workflow from its parent */
@@ -152,6 +163,8 @@ export class WorkflowContext {
       workflowsSdkModulePath: this.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
       vellumApiKey: this.vellumApiKey,
       workflowRawEdges,
+      codeExecutionNodeCodeRepresentationOverride:
+        this.codeExecutionNodeCodeRepresentationOverride,
     });
   }
 

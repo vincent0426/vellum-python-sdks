@@ -56,11 +56,13 @@ import { MergeNode } from "src/generators/nodes/merge-node";
 import { NoteNode } from "src/generators/nodes/note-node";
 import { PromptDeploymentNode } from "src/generators/nodes/prompt-deployment-node";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
+import { WorkflowSandboxFile } from "src/generators/workflow-sandbox-file";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
   EntrypointNode,
   WorkflowDataNode,
   WorkflowNodeType as WorkflowNodeTypeEnum,
+  WorkflowSandboxInputs,
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
 import { getNodeId } from "src/utils/nodes";
@@ -86,6 +88,7 @@ export declare namespace WorkflowProjectGenerator {
     workflowsSdkModulePath?: readonly string[];
     workflowVersionExecConfigData: unknown;
     vellumApiKey?: string;
+    sandboxInputs?: WorkflowSandboxInputs[];
     options?: WorkflowProjectGeneratorOptions;
   }
 
@@ -100,7 +103,7 @@ export declare namespace WorkflowProjectGenerator {
 export class WorkflowProjectGenerator {
   public readonly workflowVersionExecConfig: WorkflowVersionExecConfig;
   public readonly workflowContext: WorkflowContext;
-
+  private readonly sandboxInputs?: WorkflowSandboxInputs[];
   constructor({ moduleName, ...rest }: WorkflowProjectGenerator.Args) {
     if ("workflowContext" in rest) {
       this.workflowContext = rest.workflowContext;
@@ -157,6 +160,7 @@ ${errors.slice(0, 3).map((err) => {
         codeExecutionNodeCodeRepresentationOverride:
           rest.options?.codeExecutionNodeCodeRepresentationOverride,
       });
+      this.sandboxInputs = rest.sandboxInputs;
     }
   }
 
@@ -189,9 +193,12 @@ ${errors.slice(0, 3).map((err) => {
       workflow.getWorkflowFile().persist(),
       // nodes/*
       ...this.generateNodeFiles(nodes),
+      // sandbox.py
+      ...(this.sandboxInputs ? [this.generateSandboxFile().persist()] : []),
     ]);
 
-    // error.log
+    // error.log - this gets generated separately from the other files because it
+    // collects errors raised by the rest of the codegen process
     await this.generateErrorLogFile().persist();
 
     const setupCfgPath = this.resolvePythonConfigFilePath();
@@ -619,6 +626,13 @@ ${errors.slice(0, 3).map((err) => {
   private generateErrorLogFile(): ErrorLogFile {
     return codegen.errorLogFile({
       workflowContext: this.workflowContext,
+    });
+  }
+
+  private generateSandboxFile(): WorkflowSandboxFile {
+    return codegen.workflowSandboxFile({
+      workflowContext: this.workflowContext,
+      sandboxInputs: this.sandboxInputs ?? [],
     });
   }
 

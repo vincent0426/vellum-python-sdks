@@ -10,7 +10,6 @@ import { BaseSingleFileNode } from "src/generators/nodes/bases/single-file-base"
 import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
 import {
   ConstantValuePointer,
-  InputVariablePointer,
   SearchNode as SearchNodeType,
   VellumLogicalCondition as VellumLogicalConditionType,
   VellumLogicalConditionGroup as VellumLogicalConditionGroupType,
@@ -175,6 +174,7 @@ export class SearchNode extends BaseSingleFileNode<
           value: rawMetadata
             ? new SearchNodeMetadataFilters({
                 metadata: rawMetadata,
+                nodeInputsById: this.nodeInputsById,
               })
             : python.TypeInstantiation.none(),
         }),
@@ -192,19 +192,27 @@ export class SearchNode extends BaseSingleFileNode<
         rule.type === "CONSTANT_VALUE" && rule.data.type === "JSON"
     );
 
-    if (nodeInputValuePointer) {
-      const rawData = nodeInputValuePointer.data;
-
-      const metadataFilter = rawData.value;
-
-      const parsedData =
-        VellumValueLogicalExpressionSerializer.parse(metadataFilter);
-
-      if (parsedData.ok) {
-        return parsedData.value;
-      }
+    if (!nodeInputValuePointer) {
+      return;
     }
-    return undefined;
+
+    const metadataFilters = nodeInputValuePointer.data.value;
+    if (!metadataFilters) {
+      return undefined;
+    }
+
+    const parsedData =
+      VellumValueLogicalExpressionSerializer.parse(metadataFilters);
+
+    if (!parsedData.ok) {
+      throw new Error(
+        `Failed to parse metadata filter JSON: ${JSON.stringify(
+          parsedData.errors
+        )}`
+      );
+    }
+
+    return parsedData.value;
   }
 
   getNodeDisplayClassBodyStatements(): AstNode[] {
@@ -238,17 +246,22 @@ export class SearchNode extends BaseSingleFileNode<
     if (metadataNodeInput) {
       rawMetadata = this.convertNodeInputToMetadata(metadataNodeInput);
       if (rawMetadata) {
-        const inputVariableIdsByLogicalIdMap =
-          this.generateInputVariableIdsByLogicalIdMap(rawMetadata);
+        const metadataFilterInputIdByOperandId =
+          this.generateMetadataFilterInputIdByOperandIdMap(rawMetadata);
+
         statements.push(
           python.field({
-            name: "input_variable_ids_by_logical_id",
+            name: "metadata_filter_input_id_by_operand_id",
             initializer: python.TypeInstantiation.dict(
-              Array.from(inputVariableIdsByLogicalIdMap.entries()).map(
-                ([key, value]) => ({
-                  key: python.TypeInstantiation.str(key),
-                  value: python.TypeInstantiation.str(value),
-                })
+              Array.from(metadataFilterInputIdByOperandId.entries()).map(
+                ([metadataFilterOperandId, metadataFilterNodeInputId]) => {
+                  return {
+                    key: python.TypeInstantiation.uuid(metadataFilterOperandId),
+                    value: python.TypeInstantiation.uuid(
+                      metadataFilterNodeInputId
+                    ),
+                  };
+                }
               )
             ),
           })
@@ -259,39 +272,32 @@ export class SearchNode extends BaseSingleFileNode<
     return statements;
   }
 
-  private generateInputVariableIdsByLogicalIdMap(
+  private generateMetadataFilterInputIdByOperandIdMap(
     rawData: VellumLogicalExpression
   ): Map<string, string> {
     const result = new Map<string, string>();
-    const prefix = "vellum-query-builder-variable-";
 
     const traverse = (logicalExpression: VellumLogicalExpression) => {
       if (logicalExpression.type === "LOGICAL_CONDITION") {
-        const lhsQueryInput = this.nodeInputsByKey.get(
-          `${prefix}${logicalExpression.lhsVariableId}`
-        )?.nodeInputData?.value.rules[0] as InputVariablePointer;
-        const rhsQueryInput = this.nodeInputsByKey.get(
-          `${prefix}${logicalExpression.rhsVariableId}`
-        )?.nodeInputData?.value.rules[0] as InputVariablePointer;
+        const lhsQueryInput = this.nodeInputsById.get(
+          logicalExpression.lhsVariableId
+        )?.nodeInputData?.id;
+        const rhsQueryInput = this.nodeInputsById.get(
+          logicalExpression.rhsVariableId
+        )?.nodeInputData?.id;
         if (!lhsQueryInput) {
           throw new Error(
-            `Could not find node input for key ${prefix}${logicalExpression.lhsVariableId}}`
+            `Could not find node input for id ${logicalExpression.lhsVariableId}`
           );
         }
         if (!rhsQueryInput) {
           throw new Error(
-            `Could not find node input for key ${prefix}${logicalExpression.rhsVariableId}}`
+            `Could not find node input for id ${logicalExpression.rhsVariableId}`
           );
         }
 
-        result.set(
-          logicalExpression.lhsVariableId,
-          rhsQueryInput.data.inputVariableId
-        );
-        result.set(
-          logicalExpression.rhsVariableId,
-          rhsQueryInput.data.inputVariableId
-        );
+        result.set(logicalExpression.lhsVariableId, rhsQueryInput);
+        result.set(logicalExpression.rhsVariableId, rhsQueryInput);
       } else if (logicalExpression.type === "LOGICAL_CONDITION_GROUP") {
         logicalExpression.conditions.forEach((condition) =>
           traverse(condition)
@@ -374,17 +380,20 @@ export class SearchNode extends BaseSingleFileNode<
 export declare namespace SearchNodeMetadataFilters {
   export interface Args {
     metadata: VellumLogicalExpressionType;
+    nodeInputsById: Map<string, NodeInput>;
   }
 }
 
 export class SearchNodeMetadataFilters extends AstNode {
   private metadata: VellumLogicalExpressionType;
+  private nodeInputsById: Map<string, NodeInput>;
   private astNode: AstNode;
 
   public constructor(args: SearchNodeMetadataFilters.Args) {
     super();
 
     this.metadata = args.metadata;
+    this.nodeInputsById = args.nodeInputsById;
     this.astNode = this.generateAstNode();
     this.inheritReferences(this.astNode);
   }
@@ -445,8 +454,16 @@ export class SearchNodeMetadataFilters extends AstNode {
     data: VellumLogicalConditionType
   ): python.ClassInstantiation {
     const lhsId = data.lhsVariableId;
+    const lhs = this.nodeInputsById.get(lhsId);
+    if (!lhs) {
+      throw new Error(`Could not find node input for id ${lhsId}`);
+    }
 
     const rhsId = data.rhsVariableId;
+    const rhs = this.nodeInputsById.get(rhsId);
+    if (!rhs) {
+      throw new Error(`Could not find node input for id ${rhsId}`);
+    }
 
     return python.instantiateClass({
       classReference: python.reference({
@@ -460,22 +477,7 @@ export class SearchNodeMetadataFilters extends AstNode {
         }),
         python.methodArgument({
           name: "lhs_variable",
-          value: python.instantiateClass({
-            classReference: python.reference({
-              name: "StringVellumValueRequest",
-              modulePath: [...VELLUM_CLIENT_MODULE_PATH, "types"],
-            }),
-            arguments_: [
-              python.methodArgument({
-                name: "type",
-                value: python.TypeInstantiation.str("STRING"),
-              }),
-              python.methodArgument({
-                name: "value",
-                value: python.TypeInstantiation.str(lhsId),
-              }),
-            ],
-          }),
+          value: lhs,
         }),
         python.methodArgument({
           name: "operator",
@@ -483,22 +485,7 @@ export class SearchNodeMetadataFilters extends AstNode {
         }),
         python.methodArgument({
           name: "rhs_variable",
-          value: python.instantiateClass({
-            classReference: python.reference({
-              name: "StringVellumValueRequest",
-              modulePath: [...VELLUM_CLIENT_MODULE_PATH, "types"],
-            }),
-            arguments_: [
-              python.methodArgument({
-                name: "type",
-                value: python.TypeInstantiation.str("STRING"),
-              }),
-              python.methodArgument({
-                name: "value",
-                value: python.TypeInstantiation.str(rhsId),
-              }),
-            ],
-          }),
+          value: rhs,
         }),
       ],
     });

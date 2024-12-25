@@ -12,6 +12,7 @@ import {
 } from "src/generators/errors";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
+import { UuidOrString } from "src/generators/uuid-or-string";
 import { WorkflowProjectGenerator } from "src/project";
 import { WorkflowDataNode } from "src/types/vellum";
 
@@ -302,7 +303,7 @@ export abstract class BaseNode<
         }>(([key, nodeInput]) => {
           return {
             key: python.TypeInstantiation.str(key),
-            value: python.TypeInstantiation.uuid(nodeInput.nodeInputData.id),
+            value: new UuidOrString(nodeInput.nodeInputData.id),
           };
         })
       ),

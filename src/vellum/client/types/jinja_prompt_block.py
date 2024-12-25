@@ -13,9 +13,9 @@ class JinjaPromptBlock(UniversalBaseModel):
     A block of Jinja template code that is used to generate a prompt
     """
 
+    block_type: typing.Literal["JINJA"] = "JINJA"
     state: typing.Optional[PromptBlockState] = None
     cache_config: typing.Optional[EphemeralPromptCacheConfig] = None
-    block_type: typing.Literal["JINJA"] = "JINJA"
     template: str
 
     if IS_PYDANTIC_V2:

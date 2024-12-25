@@ -27,7 +27,11 @@ class WorkflowsClient:
         self,
         id: str,
         *,
+        exclude_code: typing.Optional[bool] = None,
         format: typing.Optional[WorkflowsPullRequestFormat] = None,
+        include_json: typing.Optional[bool] = None,
+        include_sandbox: typing.Optional[bool] = None,
+        strict: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[bytes]:
         """
@@ -38,7 +42,15 @@ class WorkflowsClient:
         id : str
             The ID of the Workflow to pull from
 
+        exclude_code : typing.Optional[bool]
+
         format : typing.Optional[WorkflowsPullRequestFormat]
+
+        include_json : typing.Optional[bool]
+
+        include_sandbox : typing.Optional[bool]
+
+        strict : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -53,7 +65,11 @@ class WorkflowsClient:
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
+                "exclude_code": exclude_code,
                 "format": format,
+                "include_json": include_json,
+                "include_sandbox": include_sandbox,
+                "strict": strict,
             },
             request_options=request_options,
         ) as _response:
@@ -164,7 +180,11 @@ class AsyncWorkflowsClient:
         self,
         id: str,
         *,
+        exclude_code: typing.Optional[bool] = None,
         format: typing.Optional[WorkflowsPullRequestFormat] = None,
+        include_json: typing.Optional[bool] = None,
+        include_sandbox: typing.Optional[bool] = None,
+        strict: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[bytes]:
         """
@@ -175,7 +195,15 @@ class AsyncWorkflowsClient:
         id : str
             The ID of the Workflow to pull from
 
+        exclude_code : typing.Optional[bool]
+
         format : typing.Optional[WorkflowsPullRequestFormat]
+
+        include_json : typing.Optional[bool]
+
+        include_sandbox : typing.Optional[bool]
+
+        strict : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -190,7 +218,11 @@ class AsyncWorkflowsClient:
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
+                "exclude_code": exclude_code,
                 "format": format,
+                "include_json": include_json,
+                "include_sandbox": include_sandbox,
+                "strict": strict,
             },
             request_options=request_options,
         ) as _response:

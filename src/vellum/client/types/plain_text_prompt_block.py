@@ -13,9 +13,9 @@ class PlainTextPromptBlock(UniversalBaseModel):
     A block that holds a plain text string value.
     """
 
+    block_type: typing.Literal["PLAIN_TEXT"] = "PLAIN_TEXT"
     state: typing.Optional[PromptBlockState] = None
     cache_config: typing.Optional[EphemeralPromptCacheConfig] = None
-    block_type: typing.Literal["PLAIN_TEXT"] = "PLAIN_TEXT"
     text: str
 
     if IS_PYDANTIC_V2:

@@ -14,9 +14,9 @@ class RichTextPromptBlock(UniversalBaseModel):
     A block that includes a combination of plain text and variable blocks.
     """
 
+    block_type: typing.Literal["RICH_TEXT"] = "RICH_TEXT"
     state: typing.Optional[PromptBlockState] = None
     cache_config: typing.Optional[EphemeralPromptCacheConfig] = None
-    block_type: typing.Literal["RICH_TEXT"] = "RICH_TEXT"
     blocks: typing.List[RichTextChildBlock]
 
     if IS_PYDANTIC_V2:

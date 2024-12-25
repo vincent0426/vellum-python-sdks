@@ -16,9 +16,9 @@ class ChatMessagePromptBlock(UniversalBaseModel):
     A block that represents a chat message in a prompt template.
     """
 
+    block_type: typing.Literal["CHAT_MESSAGE"] = "CHAT_MESSAGE"
     state: typing.Optional[PromptBlockState] = None
     cache_config: typing.Optional[EphemeralPromptCacheConfig] = None
-    block_type: typing.Literal["CHAT_MESSAGE"] = "CHAT_MESSAGE"
     chat_role: ChatMessageRole
     chat_source: typing.Optional[str] = None
     chat_message_unterminated: typing.Optional[bool] = None

@@ -15,8 +15,6 @@ class PromptNode(InlinePromptNode):
     blocks = [
         ChatMessagePromptBlock(
             chat_role="SYSTEM",
-            chat_source=None,
-            chat_message_unterminated=False,
             blocks=[
                 RichTextPromptBlock(
                     blocks=[
@@ -33,10 +31,13 @@ Summarize the following text:
                     ]
                 )
             ],
-        )
+        ),
     ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -46,4 +47,3 @@ Summarize the following text:
         logit_bias={},
         custom_parameters=None,
     )
-    prompt_inputs = {"text": Inputs.text}

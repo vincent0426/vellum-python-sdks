@@ -15,8 +15,6 @@ class PromptNode(InlinePromptNode):
     blocks = [
         ChatMessagePromptBlock(
             chat_role="SYSTEM",
-            chat_source=None,
-            chat_message_unterminated=False,
             blocks=[
                 RichTextPromptBlock(
                     blocks=[
@@ -33,10 +31,13 @@ What is the origin of the following phrase
                     ]
                 )
             ],
-        )
+        ),
     ]
+    prompt_inputs = {
+        "text": "Hello, World!",
+    }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -46,4 +47,3 @@ What is the origin of the following phrase
         logit_bias={},
         custom_parameters=None,
     )
-    prompt_inputs = {"text": "Hello, World!"}

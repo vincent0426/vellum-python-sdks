@@ -102,15 +102,11 @@ export class CodeExecutionNode extends BaseSingleFileNode<
           codeInputs.map((codeInput) => ({
             key: python.TypeInstantiation.str(codeInput.nodeInputData.key),
             value: codeInput,
-          }))
+          })),
+          {
+            endWithComma: true,
+          }
         ),
-      })
-    );
-
-    statements.push(
-      python.field({
-        name: "output_type",
-        initializer: python.TypeInstantiation.str(nodeData.outputType),
       })
     );
 
@@ -143,7 +139,10 @@ export class CodeExecutionNode extends BaseSingleFileNode<
                     }),
                   ],
                 })
-              )
+              ),
+              {
+                endWithComma: true,
+              }
             )
           : python.TypeInstantiation.none(),
       })

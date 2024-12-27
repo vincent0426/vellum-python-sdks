@@ -77,8 +77,6 @@ class PromptNode(InlinePromptNode):
     blocks = [
         ChatMessagePromptBlock(
             chat_role="SYSTEM",
-            chat_source=None,
-            chat_message_unterminated=False,
             blocks=[
                 RichTextPromptBlock(
                     blocks=[
@@ -95,10 +93,13 @@ Summarize the following text:
                     ]
                 )
             ],
-        )
+        ),
     ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -108,7 +109,6 @@ Summarize the following text:
         logit_bias={},
         custom_parameters={},
     )
-    prompt_inputs = {"text": Inputs.text}
 "
 `;
 
@@ -167,8 +167,6 @@ class PromptNode(InlinePromptNode):
     blocks = [
         ChatMessagePromptBlock(
             chat_role="SYSTEM",
-            chat_source=None,
-            chat_message_unterminated=False,
             blocks=[
                 RichTextPromptBlock(
                     blocks=[
@@ -185,10 +183,13 @@ Summarize the following text:
                     ]
                 )
             ],
-        )
+        ),
     ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -198,7 +199,6 @@ Summarize the following text:
         logit_bias={},
         custom_parameters={},
     )
-    prompt_inputs = {"text": Inputs.text}
 "
 `;
 
@@ -263,8 +263,6 @@ class PromptNode(InlinePromptNode):
     blocks = [
         ChatMessagePromptBlock(
             chat_role="SYSTEM",
-            chat_source=None,
-            chat_message_unterminated=False,
             blocks=[
                 RichTextPromptBlock(
                     blocks=[
@@ -281,10 +279,13 @@ Summarize the following text:
                     ]
                 )
             ],
-        )
+        ),
     ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -294,7 +295,6 @@ Summarize the following text:
         logit_bias={},
         custom_parameters={},
     )
-    prompt_inputs = {"text": Inputs.text}
 "
 `;
 
@@ -360,15 +360,21 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
 
 exports[`InlinePromptNode > FUNCTION_DEFINITION block type > basic > getNodeFile for FUNCTION_DEFINITION block type 1`] = `
 "from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum import PromptParameters, FunctionDefinition
 from ..inputs import Inputs
+from vellum import FunctionDefinition, PromptParameters
 
 
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = []
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
+    functions = [
+        FunctionDefinition(name="functionTest", description="This is a test function"),
+    ]
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -378,10 +384,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    prompt_inputs = {"text": Inputs.text}
-    functions = [
-        FunctionDefinition(name="functionTest", description="This is a test function")
-    ]
 "
 `;
 
@@ -425,15 +427,21 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
 
 exports[`InlinePromptNode > FUNCTION_DEFINITION block type > legacy prompt variant > getNodeFile for FUNCTION_DEFINITION block type 1`] = `
 "from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum import PromptParameters, FunctionDefinition
 from ..inputs import Inputs
+from vellum import FunctionDefinition, PromptParameters
 
 
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = []
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
+    functions = [
+        FunctionDefinition(name="functionTest", description="This is a test function"),
+    ]
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -443,10 +451,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    prompt_inputs = {"text": Inputs.text}
-    functions = [
-        FunctionDefinition(name="functionTest", description="This is a test function")
-    ]
 "
 `;
 
@@ -495,16 +499,22 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
 exports[`InlinePromptNode > FUNCTION_DEFINITION block type > reject on error enabled > getNodeFile for FUNCTION_DEFINITION block type 1`] = `
 "from vellum.workflows.nodes.displayable import InlinePromptNode
 from vellum.workflows.nodes.core import TryNode
-from vellum import PromptParameters, FunctionDefinition
 from ..inputs import Inputs
+from vellum import FunctionDefinition, PromptParameters
 
 
 @TryNode.wrap()
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = []
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
+    functions = [
+        FunctionDefinition(name="functionTest", description="This is a test function"),
+    ]
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -514,10 +524,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    prompt_inputs = {"text": Inputs.text}
-    functions = [
-        FunctionDefinition(name="functionTest", description="This is a test function")
-    ]
 "
 `;
 
@@ -590,10 +596,13 @@ from ..inputs import Inputs
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = [
-        JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}""")
+        JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
     ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -603,7 +612,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    prompt_inputs = {"text": Inputs.text}
 "
 `;
 
@@ -654,10 +662,13 @@ from ..inputs import Inputs
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = [
-        JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}""")
+        JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
     ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -667,7 +678,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    prompt_inputs = {"text": Inputs.text}
 "
 `;
 
@@ -724,10 +734,13 @@ from ..inputs import Inputs
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
     blocks = [
-        JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}""")
+        JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
     ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -737,7 +750,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    prompt_inputs = {"text": Inputs.text}
 "
 `;
 
@@ -816,10 +828,13 @@ class PromptNode(InlinePromptNode):
                     state="ENABLED", cache_config=None, text="""Hello World!"""
                 )
             ]
-        )
+        ),
     ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -829,7 +844,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    prompt_inputs = {"text": Inputs.text}
 "
 `;
 
@@ -886,10 +900,13 @@ class PromptNode(InlinePromptNode):
                     state="ENABLED", cache_config=None, text="""Hello World!"""
                 )
             ]
-        )
+        ),
     ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -899,7 +916,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    prompt_inputs = {"text": Inputs.text}
 "
 `;
 
@@ -962,10 +978,13 @@ class PromptNode(InlinePromptNode):
                     state="ENABLED", cache_config=None, text="""Hello World!"""
                 )
             ]
-        )
+        ),
     ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -975,7 +994,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    prompt_inputs = {"text": Inputs.text}
 "
 `;
 
@@ -1047,9 +1065,14 @@ from ..inputs import Inputs
 
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
-    blocks = [VariablePromptBlock(input_variable="text")]
+    blocks = [
+        VariablePromptBlock(input_variable="text"),
+    ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -1059,7 +1082,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    prompt_inputs = {"text": Inputs.text}
 "
 `;
 
@@ -1109,9 +1131,14 @@ from ..inputs import Inputs
 
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
-    blocks = [VariablePromptBlock(input_variable="text")]
+    blocks = [
+        VariablePromptBlock(input_variable="text"),
+    ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -1121,7 +1148,6 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    prompt_inputs = {"text": Inputs.text}
 "
 `;
 
@@ -1177,9 +1203,14 @@ from ..inputs import Inputs
 @TryNode.wrap()
 class PromptNode(InlinePromptNode):
     ml_model = "gpt-4o-mini"
-    blocks = [VariablePromptBlock(input_variable="text")]
+    blocks = [
+        VariablePromptBlock(input_variable="text"),
+    ]
+    prompt_inputs = {
+        "text": Inputs.text,
+    }
     parameters = PromptParameters(
-        stop=None,
+        stop=[],
         temperature=0,
         max_tokens=1000,
         top_p=1,
@@ -1189,6 +1220,5 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-    prompt_inputs = {"text": Inputs.text}
 "
 `;

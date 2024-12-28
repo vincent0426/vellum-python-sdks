@@ -84,7 +84,7 @@ export abstract class BasePersistedFile extends AstNode {
     try {
       contents = await writer.toStringFormatted({ line_width: 120 });
     } catch (error) {
-      console.error("Error formatting file", error);
+      console.error("Error formatting", fileName, "with error", error);
       contents = writer.toString();
     }
 

@@ -1079,6 +1079,7 @@ class Vellum:
         index_id: typing.Optional[str] = OMIT,
         index_name: typing.Optional[str] = OMIT,
         options: typing.Optional[SearchRequestOptionsRequest] = OMIT,
+        document_index: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SearchResponse:
         """
@@ -1090,13 +1091,16 @@ class Vellum:
             The query to search for.
 
         index_id : typing.Optional[str]
-            The ID of the index to search against. Must provide either this or index_name.
+            The ID of the index to search against. Must provide either this, index_name or document_index.
 
         index_name : typing.Optional[str]
-            The name of the index to search against. Must provide either this or index_id.
+            The name of the index to search against. Must provide either this, index_id or document_index.
 
         options : typing.Optional[SearchRequestOptionsRequest]
             Configuration options for the search.
+
+        document_index : typing.Optional[str]
+            Either the index name or index ID to search against. Must provide either this, index_id or index_name.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1128,6 +1132,7 @@ class Vellum:
                 "options": convert_and_respect_annotation_metadata(
                     object_=options, annotation=SearchRequestOptionsRequest, direction="write"
                 ),
+                "document_index": document_index,
             },
             request_options=request_options,
             omit=OMIT,
@@ -2395,6 +2400,7 @@ class AsyncVellum:
         index_id: typing.Optional[str] = OMIT,
         index_name: typing.Optional[str] = OMIT,
         options: typing.Optional[SearchRequestOptionsRequest] = OMIT,
+        document_index: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SearchResponse:
         """
@@ -2406,13 +2412,16 @@ class AsyncVellum:
             The query to search for.
 
         index_id : typing.Optional[str]
-            The ID of the index to search against. Must provide either this or index_name.
+            The ID of the index to search against. Must provide either this, index_name or document_index.
 
         index_name : typing.Optional[str]
-            The name of the index to search against. Must provide either this or index_id.
+            The name of the index to search against. Must provide either this, index_id or document_index.
 
         options : typing.Optional[SearchRequestOptionsRequest]
             Configuration options for the search.
+
+        document_index : typing.Optional[str]
+            Either the index name or index ID to search against. Must provide either this, index_id or index_name.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -2452,6 +2461,7 @@ class AsyncVellum:
                 "options": convert_and_respect_annotation_metadata(
                     object_=options, annotation=SearchRequestOptionsRequest, direction="write"
                 ),
+                "document_index": document_index,
             },
             request_options=request_options,
             omit=OMIT,

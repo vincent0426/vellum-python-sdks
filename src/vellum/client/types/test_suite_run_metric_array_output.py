@@ -4,14 +4,20 @@ from __future__ import annotations
 from ..core.pydantic_utilities import UniversalBaseModel
 from .array_vellum_value import ArrayVellumValue
 import typing
-from .test_suite_run_metric_output import TestSuiteRunMetricOutput
+from .vellum_value import VellumValue
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 from ..core.pydantic_utilities import update_forward_refs
 
 
-class MetricDefinitionExecution(UniversalBaseModel):
-    outputs: typing.List[TestSuiteRunMetricOutput]
+class TestSuiteRunMetricArrayOutput(UniversalBaseModel):
+    """
+    Output for a test suite run metric that is of type ARRAY
+    """
+
+    value: typing.Optional[typing.List[VellumValue]] = None
+    type: typing.Literal["ARRAY"] = "ARRAY"
+    name: str
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
@@ -23,4 +29,4 @@ class MetricDefinitionExecution(UniversalBaseModel):
             extra = pydantic.Extra.allow
 
 
-update_forward_refs(ArrayVellumValue, MetricDefinitionExecution=MetricDefinitionExecution)
+update_forward_refs(ArrayVellumValue, TestSuiteRunMetricArrayOutput=TestSuiteRunMetricArrayOutput)

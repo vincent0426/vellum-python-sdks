@@ -402,6 +402,7 @@ from .test_suite_run_external_exec_config import TestSuiteRunExternalExecConfig
 from .test_suite_run_external_exec_config_data import TestSuiteRunExternalExecConfigData
 from .test_suite_run_external_exec_config_data_request import TestSuiteRunExternalExecConfigDataRequest
 from .test_suite_run_external_exec_config_request import TestSuiteRunExternalExecConfigRequest
+from .test_suite_run_metric_array_output import TestSuiteRunMetricArrayOutput
 from .test_suite_run_metric_error_output import TestSuiteRunMetricErrorOutput
 from .test_suite_run_metric_json_output import TestSuiteRunMetricJsonOutput
 from .test_suite_run_metric_number_output import TestSuiteRunMetricNumberOutput
@@ -910,6 +911,7 @@ __all__ = [
     "TestSuiteRunExternalExecConfigData",
     "TestSuiteRunExternalExecConfigDataRequest",
     "TestSuiteRunExternalExecConfigRequest",
+    "TestSuiteRunMetricArrayOutput",
     "TestSuiteRunMetricErrorOutput",
     "TestSuiteRunMetricJsonOutput",
     "TestSuiteRunMetricNumberOutput",

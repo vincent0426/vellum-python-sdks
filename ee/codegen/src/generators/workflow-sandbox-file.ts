@@ -79,14 +79,17 @@ if __name__ != "__main__":
         name: "Inputs",
         modulePath: getGeneratedInputsModulePath(this.workflowContext),
       }),
-      arguments_: inputs.map((input) =>
-        python.methodArgument({
-          name: input.name,
+      arguments_: inputs.map((input) => {
+        const inputVariableContext =
+          this.workflowContext.getInputVariableContextByRawName(input.name);
+
+        return python.methodArgument({
+          name: inputVariableContext.name,
           value: vellumValue({
             vellumValue: input,
           }),
-        })
-      ),
+        });
+      }),
     });
   }
 }

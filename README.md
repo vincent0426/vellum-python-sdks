@@ -1,7 +1,9 @@
 <p align="center">
-  <h1 align="center">
-  Vellum
-  </h1>
+   <a href="https://vellum.ai">
+    <picture>
+      <img alt="Vellum README banner" src="https://storage.googleapis.com/vellum-public/assets/github-readme-banner.png" height="128">
+    </picture>
+  </a>
   <p align="center">
     <a href="https://vellum.ai">Learn more</a>
     ·
@@ -23,13 +25,13 @@
 
 # Introduction
 
-[Vellum](https://www.vellum.ai/) is the end-to-end development platform for building production-grade AI applications
+[Vellum](https://www.vellum.ai/) is the end-to-end development platform for building production-grade AI applications.
 
 ### Core Features
 
 - **Orchestration:** A powerful SDK and IDE for defining and debugging the control flow of your AI applications
 - **Prompting:** A best-in-class prompt playground for iterating on and refining prompts between models from any provider
-- **Evaluations**: An evaluations framework that makes it easy to measure the quality of your AI systems at scale.
+- **Evaluations**: An evaluations framework that makes it easy to measure the quality of your AI systems at scale
 - **Retrieval:** A ready-to-go service for turning unstructured content into intelligent, context-aware solutions
   optimized for AI systems
 - **Deployment:** Decouple updates to your AI systems from your application code with an easy integration +
@@ -46,7 +48,7 @@
 
 ## Get Started
 
-Most functionality within the SDKs here requires a Vellum account and API key. To sign up, [talk to us](https://www.vellum.ai/landing-pages/request-demo)
+Most functionality within the SDK requires a Vellum account and API key. To sign up, [talk to us](https://www.vellum.ai/landing-pages/request-demo)
 or visit our [pricing page](https://www.vellum.ai/pricing).
 
 Even without a Vellum account, you can use the Workflows SDK to define the control flow of your AI systems. [Learn
@@ -60,7 +62,7 @@ Learn more and get started by visiting the [Vellum Client SDK README](/src/vellu
 ## Workflows SDK
 
 The Vellum Workflows SDK is a high-level framework for defining and debugging the control flow of AI systems. At
-it's core, it's a powerful workflow engine with syntactic sugar for intuitively defining graphs, the nodes within,
+it's core, it's a powerful workflow engine with syntactic sugar for declaratively defining graphs, the nodes within,
 and the relationships between them.
 
 The Workflows SDK can be used with or without a Vellum account, but a Vellum account is required to use certain

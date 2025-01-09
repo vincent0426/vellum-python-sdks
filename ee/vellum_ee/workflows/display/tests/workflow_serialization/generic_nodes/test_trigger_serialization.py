@@ -14,22 +14,6 @@ class BasicGenericNode(BaseNode):
         output = Inputs.input
 
 
-class AwaitAnyGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ANY
-
-
-class AwaitAllGenericNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ALL
-
-
 def test_serialize_node__basic(serialize_node):
     serialized_node = serialize_node(BasicGenericNode)
     assert not DeepDiff(
@@ -52,13 +36,26 @@ def test_serialize_node__basic(serialize_node):
                 "bases": [{"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]}],
             },
             "trigger": {"id": "9d3a1b3d-4a38-4f2e-bbf1-dd8be152bce8", "merge_behavior": "AWAIT_ANY"},
-            "ports": [],
+            "ports": [
+                {
+                    "id": "4fbf0fff-a42e-4410-852a-238b5059198e",
+                    "type": "DEFAULT",
+                }
+            ],
             "adornments": None,
             "attributes": [],
         },
         serialized_node,
         ignore_order=True,
     )
+
+
+class AwaitAnyGenericNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output = Inputs.input
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
 
 
 def test_serialize_node__await_any(serialize_node):
@@ -83,13 +80,26 @@ def test_serialize_node__await_any(serialize_node):
                 "bases": [{"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]}],
             },
             "trigger": {"id": "ffa72187-9a18-453f-ae55-b77aad332630", "merge_behavior": "AWAIT_ANY"},
-            "ports": [],
+            "ports": [
+                {
+                    "id": "3e219c0a-e5f8-443a-ac78-1a458b189009",
+                    "type": "DEFAULT",
+                }
+            ],
             "adornments": None,
             "attributes": [],
         },
         serialized_node,
         ignore_order=True,
     )
+
+
+class AwaitAllGenericNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output = Inputs.input
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
 
 
 def test_serialize_node__await_all(serialize_node):
@@ -114,7 +124,12 @@ def test_serialize_node__await_all(serialize_node):
                 "bases": [{"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]}],
             },
             "trigger": {"id": "62074276-c817-476d-b59d-da523ae3f218", "merge_behavior": "AWAIT_ALL"},
-            "ports": [],
+            "ports": [
+                {
+                    "id": "9797e93f-9fe6-48b2-a48e-476abbd20e32",
+                    "type": "DEFAULT",
+                }
+            ],
             "adornments": None,
             "attributes": [],
         },

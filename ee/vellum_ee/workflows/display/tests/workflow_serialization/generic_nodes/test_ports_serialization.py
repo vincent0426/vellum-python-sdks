@@ -701,3 +701,315 @@ def test_serialize_node__or(serialize_node):
         serialized_node,
         ignore_order=True,
     )
+
+
+class AndThenOrGenericNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output = Inputs.input
+
+    class Ports(BaseNode.Ports):
+        if_branch = Port.on_if(
+            Inputs.input.equals("hello") & Inputs.input.equals("then") | Inputs.input.equals("world")
+        )
+
+
+def test_serialize_node__and_then_or(serialize_node):
+    input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=AndThenOrGenericNode,
+        global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
+    )
+
+    assert not DeepDiff(
+        {
+            "id": "b3908206-e540-4dac-9c64-a2e12b847b15",
+            "label": "AndThenOrGenericNode",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "AndThenOrGenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_ports_serialization",
+                ],
+            },
+            "trigger": {"id": "33cfa8f4-bfc5-40b3-8df8-ab86371c26e0", "merge_behavior": "AWAIT_ANY"},
+            "ports": [
+                {
+                    "id": "42c89e95-6bbf-4e85-8f26-d4b6fc55d99c",
+                    "type": "IF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {
+                            "type": "BINARY_EXPRESSION",
+                            "lhs": {
+                                "type": "BINARY_EXPRESSION",
+                                "lhs": {
+                                    "type": "WORKFLOW_INPUT",
+                                    "input_variable_id": str(input_id),
+                                },
+                                "operator": "=",
+                                "rhs": {
+                                    "type": "CONSTANT_VALUE",
+                                    "value": {
+                                        "type": "STRING",
+                                        "value": "hello",
+                                    },
+                                },
+                            },
+                            "operator": "and",
+                            "rhs": {
+                                "type": "BINARY_EXPRESSION",
+                                "lhs": {
+                                    "type": "WORKFLOW_INPUT",
+                                    "input_variable_id": str(input_id),
+                                },
+                                "operator": "=",
+                                "rhs": {
+                                    "type": "CONSTANT_VALUE",
+                                    "value": {
+                                        "type": "STRING",
+                                        "value": "then",
+                                    },
+                                },
+                            },
+                        },
+                        "operator": "or",
+                        "rhs": {
+                            "type": "BINARY_EXPRESSION",
+                            "lhs": {
+                                "type": "WORKFLOW_INPUT",
+                                "input_variable_id": str(input_id),
+                            },
+                            "operator": "=",
+                            "rhs": {
+                                "type": "CONSTANT_VALUE",
+                                "value": {
+                                    "type": "STRING",
+                                    "value": "world",
+                                },
+                            },
+                        },
+                    },
+                }
+            ],
+            "adornments": None,
+            "attributes": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
+
+
+class ParenthesizedAndThenOrGenericNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output = Inputs.input
+
+    class Ports(BaseNode.Ports):
+        if_branch = Port.on_if(
+            Inputs.input.equals("hello") & (Inputs.input.equals("then") | Inputs.input.equals("world"))
+        )
+
+
+def test_serialize_node__parenthesized_and_then_or(serialize_node):
+    input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=ParenthesizedAndThenOrGenericNode,
+        global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
+    )
+
+    assert not DeepDiff(
+        {
+            "id": "6ed0373a-13b1-4edb-b0c4-31642cf312f8",
+            "label": "ParenthesizedAndThenOrGenericNode",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "ParenthesizedAndThenOrGenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_ports_serialization",
+                ],
+            },
+            "trigger": {"id": "91ac3b05-c931-4a4c-bb48-c2ba0e883867", "merge_behavior": "AWAIT_ANY"},
+            "ports": [
+                {
+                    "id": "cc07394b-f20b-4370-8a5b-af90e847a73f",
+                    "type": "IF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {
+                            "type": "BINARY_EXPRESSION",
+                            "lhs": {
+                                "type": "WORKFLOW_INPUT",
+                                "input_variable_id": str(input_id),
+                            },
+                            "operator": "=",
+                            "rhs": {
+                                "type": "CONSTANT_VALUE",
+                                "value": {
+                                    "type": "STRING",
+                                    "value": "hello",
+                                },
+                            },
+                        },
+                        "operator": "and",
+                        "rhs": {
+                            "type": "BINARY_EXPRESSION",
+                            "lhs": {
+                                "type": "BINARY_EXPRESSION",
+                                "lhs": {
+                                    "type": "WORKFLOW_INPUT",
+                                    "input_variable_id": str(input_id),
+                                },
+                                "operator": "=",
+                                "rhs": {
+                                    "type": "CONSTANT_VALUE",
+                                    "value": {
+                                        "type": "STRING",
+                                        "value": "then",
+                                    },
+                                },
+                            },
+                            "operator": "or",
+                            "rhs": {
+                                "type": "BINARY_EXPRESSION",
+                                "lhs": {
+                                    "type": "WORKFLOW_INPUT",
+                                    "input_variable_id": str(input_id),
+                                },
+                                "operator": "=",
+                                "rhs": {
+                                    "type": "CONSTANT_VALUE",
+                                    "value": {
+                                        "type": "STRING",
+                                        "value": "world",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                }
+            ],
+            "adornments": None,
+            "attributes": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
+
+
+class OrThenAndGenericNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output = Inputs.input
+
+    class Ports(BaseNode.Ports):
+        if_branch = Port.on_if(
+            Inputs.input.equals("hello") | Inputs.input.equals("then") & Inputs.input.equals("world")
+        )
+
+
+def test_serialize_node__or_then_and(serialize_node):
+    input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=OrThenAndGenericNode,
+        global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
+    )
+
+    assert not DeepDiff(
+        {
+            "id": "a0e0a35b-132e-4168-ad7d-ceb04f3203f2",
+            "label": "OrThenAndGenericNode",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "OrThenAndGenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_ports_serialization",
+                ],
+            },
+            "trigger": {"id": "dfa53d32-36cc-4b1d-adad-d4de21ac1e5a", "merge_behavior": "AWAIT_ANY"},
+            "ports": [
+                {
+                    "id": "daaff604-da1e-45e6-b3df-5bc8de8d55fe",
+                    "type": "IF",
+                    "expression": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {
+                            "type": "BINARY_EXPRESSION",
+                            "lhs": {
+                                "type": "WORKFLOW_INPUT",
+                                "input_variable_id": str(input_id),
+                            },
+                            "operator": "=",
+                            "rhs": {
+                                "type": "CONSTANT_VALUE",
+                                "value": {
+                                    "type": "STRING",
+                                    "value": "hello",
+                                },
+                            },
+                        },
+                        "operator": "or",
+                        "rhs": {
+                            "type": "BINARY_EXPRESSION",
+                            "lhs": {
+                                "type": "BINARY_EXPRESSION",
+                                "lhs": {
+                                    "type": "WORKFLOW_INPUT",
+                                    "input_variable_id": str(input_id),
+                                },
+                                "operator": "=",
+                                "rhs": {
+                                    "type": "CONSTANT_VALUE",
+                                    "value": {
+                                        "type": "STRING",
+                                        "value": "then",
+                                    },
+                                },
+                            },
+                            "operator": "and",
+                            "rhs": {
+                                "type": "BINARY_EXPRESSION",
+                                "lhs": {
+                                    "type": "WORKFLOW_INPUT",
+                                    "input_variable_id": str(input_id),
+                                },
+                                "operator": "=",
+                                "rhs": {
+                                    "type": "CONSTANT_VALUE",
+                                    "value": {
+                                        "type": "STRING",
+                                        "value": "world",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                }
+            ],
+            "adornments": None,
+            "attributes": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )

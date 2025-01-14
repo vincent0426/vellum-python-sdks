@@ -133,6 +133,11 @@ class UniversalBaseModel(pydantic.BaseModel):
         #
         # We'd ideally do the same for Pydantic V2, but it shells out to a library to serialize models
         # that we have less control over, and this is less intrusive than custom serializers for now.
+        kwargs = {
+            **kwargs,
+            "warnings": False,
+        }
+
         if IS_PYDANTIC_V2:
             kwargs_with_defaults_exclude_unset: typing.Any = {
                 **kwargs,

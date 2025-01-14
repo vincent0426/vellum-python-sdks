@@ -26,6 +26,8 @@ LogicalOperator = typing.Union[
         "notBlank",
         "coalesce",
         "accessField",
+        "and",
+        "or",
     ],
     typing.Any,
 ]

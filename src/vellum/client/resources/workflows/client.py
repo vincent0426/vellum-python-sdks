@@ -101,6 +101,7 @@ class WorkflowsClient:
         deployment_config: typing.Optional[WorkflowPushDeploymentConfigRequest] = OMIT,
         artifact: typing.Optional[core.File] = OMIT,
         dry_run: typing.Optional[bool] = OMIT,
+        strict: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowPushResponse:
         """
@@ -119,6 +120,8 @@ class WorkflowsClient:
             See core.File for more documentation
 
         dry_run : typing.Optional[bool]
+
+        strict : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -150,6 +153,7 @@ class WorkflowsClient:
                 "workflow_sandbox_id": workflow_sandbox_id,
                 "deployment_config": deployment_config,
                 "dry_run": dry_run,
+                "strict": strict,
             },
             files={
                 "artifact": artifact,
@@ -254,6 +258,7 @@ class AsyncWorkflowsClient:
         deployment_config: typing.Optional[WorkflowPushDeploymentConfigRequest] = OMIT,
         artifact: typing.Optional[core.File] = OMIT,
         dry_run: typing.Optional[bool] = OMIT,
+        strict: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowPushResponse:
         """
@@ -272,6 +277,8 @@ class AsyncWorkflowsClient:
             See core.File for more documentation
 
         dry_run : typing.Optional[bool]
+
+        strict : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -311,6 +318,7 @@ class AsyncWorkflowsClient:
                 "workflow_sandbox_id": workflow_sandbox_id,
                 "deployment_config": deployment_config,
                 "dry_run": dry_run,
+                "strict": strict,
             },
             files={
                 "artifact": artifact,

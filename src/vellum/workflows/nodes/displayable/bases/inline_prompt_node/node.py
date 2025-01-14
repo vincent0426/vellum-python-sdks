@@ -53,8 +53,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
 
     def _get_prompt_event_stream(self) -> Iterator[AdHocExecutePromptEvent]:
         input_variables, input_values = self._compile_prompt_inputs()
-        current_parent_context = get_parent_context()
-        parent_context = current_parent_context.model_dump_json() if current_parent_context else None
+        parent_context = get_parent_context()
         request_options = self.request_options or RequestOptions()
         request_options["additional_body_parameters"] = {
             "execution_context": {"parent_context": parent_context},
@@ -77,7 +76,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             blocks=self.blocks,
             functions=normalized_functions,
             expand_meta=self.expand_meta,
-            request_options=self.request_options,
+            request_options=request_options,
         )
 
     def _compile_prompt_inputs(self) -> Tuple[List[VellumVariable], List[PromptRequestInput]]:

@@ -17,12 +17,14 @@ class Inputs(BaseInputs):
 class ConstantValueGenericNode(BaseNode):
     attr: str = "hello"
 
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
 
 def test_serialize_node__constant_value(serialize_node):
-    serialized_node = serialize_node(ConstantValueGenericNode)
+    input_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=ConstantValueGenericNode,
+        global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
+    )
+
     assert not DeepDiff(
         {
             "id": "be892bc8-e4de-47ef-ab89-dc9d869af1fe",
@@ -67,9 +69,6 @@ def test_serialize_node__constant_value(serialize_node):
 
 class WorkflowInputGenericNode(BaseNode):
     attr: str = Inputs.input
-
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
 
 
 def test_serialize_node__workflow_input(serialize_node):
@@ -129,9 +128,6 @@ class NodeWithOutputDisplay(BaseNodeDisplay[NodeWithOutput]):
 class GenericNodeReferencingOutput(BaseNode):
     attr = NodeWithOutput.Outputs.output
 
-    class Outputs(BaseNode.Outputs):
-        output = NodeWithOutput.Outputs.output
-
 
 def test_serialize_node__node_output(serialize_node):
     workflow_input_id = uuid4()
@@ -188,9 +184,6 @@ def test_serialize_node__node_output(serialize_node):
 class VellumSecretGenericNode(BaseNode):
     attr = VellumSecretReference(name="hello")
 
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
 
 def test_serialize_node__vellum_secret(serialize_node):
     input_id = uuid4()
@@ -244,9 +237,6 @@ class NodeWithExecutionsDisplay(BaseNodeDisplay[NodeWithExecutions]):
 
 class GenericNodeReferencingExecutions(BaseNode):
     attr: int = NodeWithExecutions.Execution.count
-
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
 
 
 def test_serialize_node__node_execution(serialize_node):

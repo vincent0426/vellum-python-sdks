@@ -1,4 +1,4 @@
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, TypeVar, cast
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.between import BetweenExpression
@@ -25,6 +25,18 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
     def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
         node = self._node
         node_id = self.node_id
+
+        attributes: JsonArray = []
+        for attribute in node:
+            id = str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
+
+            attributes.append(
+                {
+                    "id": id,
+                    "name": attribute.name,
+                    "value": self.serialize_value(display_context, cast(BaseDescriptor, attribute.instance)),
+                }
+            )
 
         ports: JsonArray = []
         for idx, port in enumerate(node.Ports):
@@ -63,7 +75,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
             },
             "ports": ports,
             "adornments": None,
-            "attributes": [],
+            "attributes": attributes,
             "outputs": [],
         }
 

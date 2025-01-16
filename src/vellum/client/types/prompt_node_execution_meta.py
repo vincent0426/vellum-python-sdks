@@ -3,6 +3,7 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
 from .ml_model_usage import MlModelUsage
+from .price import Price
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
@@ -13,6 +14,8 @@ class PromptNodeExecutionMeta(UniversalBaseModel):
     """
 
     usage: typing.Optional[MlModelUsage] = None
+    cost: typing.Optional[Price] = None
+    model_name: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

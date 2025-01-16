@@ -12,6 +12,16 @@ class WorkflowExpandMetaRequest(UniversalBaseModel):
     If enabled, the Prompt Node FULFILLED events will include model host usage tracking. This may increase latency for some model hosts.
     """
 
+    cost: typing.Optional[bool] = pydantic.Field(default=None)
+    """
+    If enabled, the Prompt Node FULFILLED events will include model host cost tracking. This may increase latency for some model hosts.
+    """
+
+    model_name: typing.Optional[bool] = pydantic.Field(default=None)
+    """
+    If enabled, the Prompt Node FULFILLED events will include model host name
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
     else:

@@ -1,10 +1,12 @@
 from abc import abstractmethod
 from copy import copy
 from functools import cached_property
+import importlib
 import logging
 from uuid import UUID
-from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, Type, get_args
+from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, Type, Union, get_args
 
+from vellum.workflows import BaseWorkflow
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
 from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
@@ -29,7 +31,7 @@ from vellum_ee.workflows.display.base import (
 )
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.types import NodeDisplayType, WorkflowDisplayContext
+from vellum_ee.workflows.display.types import NodeDisplayType, WorkflowDisplayContext, WorkflowEventDisplayContext
 
 logger = logging.getLogger(__name__)
 
@@ -333,3 +335,14 @@ class BaseWorkflowDisplay(
 
         workflow_class = get_args(cls.__orig_bases__[0])[0]  # type: ignore [attr-defined]
         cls._workflow_display_registry[workflow_class] = cls
+
+    @staticmethod
+    def gather_event_display_context(
+        module_path: str, workflow_class: Type[BaseWorkflow]
+    ) -> Union[WorkflowEventDisplayContext, None]:
+        workflow_display_module = f"{module_path}.display.workflow"
+        try:
+            display_class = importlib.import_module(workflow_display_module)
+        except ModuleNotFoundError:
+            return None
+        return display_class.WorkflowDisplay(workflow_class).display_context.build_event_display_context()

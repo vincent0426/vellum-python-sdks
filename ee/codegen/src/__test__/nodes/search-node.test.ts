@@ -58,10 +58,9 @@ describe("TextSearchNode", () => {
         workflowContext,
         nodeData,
       })) as TextSearchNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new SearchNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });
@@ -87,10 +86,9 @@ describe("TextSearchNode", () => {
         workflowContext,
         nodeData,
       })) as TextSearchNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new SearchNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });
@@ -223,10 +221,9 @@ describe("TextSearchNode", () => {
         workflowContext,
         nodeData,
       })) as TextSearchNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new SearchNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });
@@ -258,10 +255,9 @@ describe("TextSearchNode", () => {
         workflowContext,
         nodeData,
       })) as TextSearchNodeContext;
-      workflowContext.addNodeContext(nodeContext);
 
       node = new SearchNode({
-        workflowContext: workflowContext,
+        workflowContext,
         nodeContext,
       });
     });

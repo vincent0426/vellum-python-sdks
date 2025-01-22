@@ -10,6 +10,10 @@ import { inputVariableContextFactory } from "src/__test__/helpers/input-variable
 import { searchNodeDataFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { TextSearchNodeContext } from "src/context/node-context/text-search-node";
+import {
+  NodeAttributeGenerationError,
+  ValueGenerationError,
+} from "src/generators/errors";
 import { SearchNode } from "src/generators/nodes/search-node";
 
 describe("TextSearchNode", () => {
@@ -236,6 +240,105 @@ describe("TextSearchNode", () => {
     it("getNodeDisplayFile", async () => {
       node.getNodeDisplayFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("limit param should cast string to int", () => {
+    beforeEach(async () => {
+      const nodeData = searchNodeDataFactory({
+        limitInput: {
+          type: "CONSTANT_VALUE",
+          data: {
+            type: "STRING",
+            value: "8",
+          },
+        },
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as TextSearchNodeContext;
+
+      node = new SearchNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("getNodeFile", async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("limit param should throw exception if casting string that is not an int", () => {
+    beforeEach(async () => {
+      const nodeData = searchNodeDataFactory({
+        limitInput: {
+          type: "CONSTANT_VALUE",
+          data: {
+            type: "STRING",
+            value: "not-a-number",
+          },
+        },
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as TextSearchNodeContext;
+
+      node = new SearchNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("should throw ValueGenerationError", async () => {
+      await expect(async () => {
+        node.getNodeFile().write(writer);
+        await writer.toStringFormatted();
+      }).rejects.toThrow(
+        new ValueGenerationError(
+          'Failed to parse search node limit value "not-a-number" as an integer'
+        )
+      );
+    });
+  });
+
+  describe("limit param should throw exception if not a constant value of type number", () => {
+    beforeEach(async () => {
+      const nodeData = searchNodeDataFactory({
+        limitInput: {
+          type: "CONSTANT_VALUE",
+          data: {
+            type: "JSON",
+            value: "{}",
+          },
+        },
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as TextSearchNodeContext;
+
+      node = new SearchNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("should throw NodeAttributeGenerationError", async () => {
+      await expect(async () => {
+        node.getNodeFile().write(writer);
+        await writer.toStringFormatted();
+      }).rejects.toThrow(
+        new NodeAttributeGenerationError(
+          "Limit param input should be a CONSTANT_VALUE and of type NUMBER, got JSON instead"
+        )
+      );
     });
   });
 

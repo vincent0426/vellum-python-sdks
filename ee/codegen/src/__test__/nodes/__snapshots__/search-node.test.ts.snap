@@ -99,6 +99,47 @@ class SearchNode(BaseSearchNode):
 "
 `;
 
+exports[`TextSearchNode > limit param should cast string to int > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import SearchNode as BaseSearchNode
+from ..inputs import Inputs
+from vellum import SearchWeightsRequest, SearchResultMergingRequest
+from vellum.workflows.nodes.displayable.bases.types import (
+    SearchFilters,
+    MetadataLogicalConditionGroup,
+    MetadataLogicalCondition,
+)
+
+
+class SearchNode(BaseSearchNode):
+    query = Inputs.query
+    document_index = "my-sweet-document"
+    limit = 8
+    weights = SearchWeightsRequest(semantic_similarity=0.8, keywords=0.2)
+    result_merging = SearchResultMergingRequest(enabled=True)
+    filters = SearchFilters(
+        external_ids=None,
+        metadata=MetadataLogicalConditionGroup(
+            combinator="AND",
+            negated=False,
+            conditions=[
+                MetadataLogicalConditionGroup(
+                    combinator="AND",
+                    negated=False,
+                    conditions=[
+                        MetadataLogicalCondition(
+                            lhs_variable=Inputs.var1,
+                            operator="=",
+                            rhs_variable=Inputs.var1,
+                        )
+                    ],
+                )
+            ],
+        ),
+    )
+    chunk_separator = "\\n\\n#####\\n\\n"
+"
+`;
+
 exports[`TextSearchNode > metadata filters > getNodeDisplayFile 1`] = `
 "from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
 from ...nodes.search_node import SearchNode

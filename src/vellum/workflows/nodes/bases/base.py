@@ -237,7 +237,7 @@ class BaseNode(Generic[StateType], metaclass=BaseNodeMeta):
 
     class Trigger(metaclass=_BaseNodeTriggerMeta):
         node_class: Type["BaseNode"]
-        merge_behavior = MergeBehavior.AWAIT_ANY
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 
         @classmethod
         def should_initiate(

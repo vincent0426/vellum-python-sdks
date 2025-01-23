@@ -1,4 +1,5 @@
-from typing import Any, Generic, TypeVar, cast
+import inspect
+from typing import Any, Generic, Optional, TypeVar, cast
 
 from vellum.workflows.constants import UNDEF
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -11,6 +12,7 @@ from vellum.workflows.expressions.is_null import IsNullExpression
 from vellum.workflows.expressions.is_undefined import IsUndefinedExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.nodes.utils import get_wrapped_node, has_wrapped_node
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
@@ -18,7 +20,9 @@ from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
+from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.vellum.utils import convert_descriptor_to_operator
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.vellum import primitive_to_vellum_value
@@ -28,14 +32,19 @@ _BaseNodeType = TypeVar("_BaseNodeType", bound=BaseNode)
 
 
 class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeType]):
-    def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
+    def serialize(
+        self, display_context: WorkflowDisplayContext, adornments: Optional[JsonArray] = None, **kwargs: Any
+    ) -> JsonObject:
         node = self._node
         node_id = self.node_id
 
         attributes: JsonArray = []
         for attribute in node:
-            id = str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
+            if inspect.isclass(attribute.instance) and issubclass(attribute.instance, BaseWorkflow):
+                # We don't need to serialize generic node attributes containing a subworkflow
+                continue
 
+            id = str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
             attributes.append(
                 {
                     "id": id,
@@ -43,6 +52,20 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
                     "value": self.serialize_value(display_context, cast(BaseDescriptor, attribute.instance)),
                 }
             )
+
+        if has_wrapped_node(node):
+            wrapped_node = get_wrapped_node(node)
+            display_class = get_node_display_class(BaseNodeDisplay, wrapped_node)
+
+            adornment: JsonObject = {
+                "id": str(node_id),
+                "label": node.__qualname__,
+                "base": self.get_base().dict(),
+                "attributes": attributes,
+            }
+
+            existing_adornments = adornments if adornments is not None else []
+            return display_class().serialize(display_context, adornments=existing_adornments + [adornment])
 
         ports: JsonArray = []
         for idx, port in enumerate(node.Ports):
@@ -98,7 +121,7 @@ class BaseNodeDisplay(BaseNodeVellumDisplay[_BaseNodeType], Generic[_BaseNodeTyp
                 "merge_behavior": node.Trigger.merge_behavior.value,
             },
             "ports": ports,
-            "adornments": None,
+            "adornments": adornments,
             "attributes": attributes,
             "outputs": outputs,
         }

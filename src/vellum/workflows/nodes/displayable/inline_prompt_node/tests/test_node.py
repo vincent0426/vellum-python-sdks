@@ -1,7 +1,9 @@
+import pytest
 from dataclasses import dataclass
 from uuid import uuid4
 from typing import Any, Iterator, List
 
+from vellum.client.core.api_error import ApiError
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
@@ -12,6 +14,8 @@ from vellum.client.types.initiated_execute_prompt_event import InitiatedExecuteP
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.prompt_request_json_input import PromptRequestJsonInput
 from vellum.client.types.string_vellum_value import StringVellumValue
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 
 
@@ -126,3 +130,54 @@ def test_inline_prompt_node__function_definitions(vellum_adhoc_prompt_client):
     "name": "my_function"
 }"""
     )
+
+
+@pytest.mark.parametrize(
+    ["exception", "expected_code", "expected_message"],
+    [
+        (
+            ApiError(status_code=404, body={"detail": "Model not found"}),
+            WorkflowErrorCode.INVALID_INPUTS,
+            "Model not found",
+        ),
+        (
+            ApiError(status_code=404, body={"message": "Model not found"}),
+            WorkflowErrorCode.INVALID_INPUTS,
+            "Failed to execute prompt",
+        ),
+        (
+            ApiError(status_code=404, body="Model not found"),
+            WorkflowErrorCode.INTERNAL_ERROR,
+            "Failed to execute prompt",
+        ),
+        (
+            ApiError(status_code=None, body={"detail": "Model not found"}),
+            WorkflowErrorCode.INTERNAL_ERROR,
+            "Failed to execute prompt",
+        ),
+        (
+            ApiError(status_code=500, body={"detail": "Model not found"}),
+            WorkflowErrorCode.INTERNAL_ERROR,
+            "Failed to execute prompt",
+        ),
+    ],
+    ids=["404", "invalid_dict", "invalid_body", "no_status_code", "500"],
+)
+def test_inline_prompt_node__api_error__invalid_inputs_node_exception(
+    vellum_adhoc_prompt_client, exception, expected_code, expected_message
+):
+    # GIVEN a prompt node with an invalid model name
+    class MyNode(InlinePromptNode):
+        ml_model = "my-invalid-model"
+        blocks = []
+
+    # AND the adhoc prompt client raises a 4xx error
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = exception
+
+    # WHEN the node is run
+    with pytest.raises(NodeException) as e:
+        list(MyNode().run())
+
+    # THEN the node raises the correct NodeException
+    assert e.value.code == expected_code
+    assert e.value.message == expected_message

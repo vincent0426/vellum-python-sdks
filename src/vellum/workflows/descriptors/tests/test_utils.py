@@ -77,6 +77,10 @@ class DummyNode(BaseNode[FixtureState]):
         (FixtureState.zeta["foo"], "bar"),
         (ConstantValueReference(1), 1),
         (FixtureState.theta[0], "baz"),
+        (FixtureState.gamma.matches_regex(r"^h.*o$"), True),  # "hello" matches the regex
+        (FixtureState.gamma.matches_regex(r"^e.*o$"), False),  # "hello" does not match the regex
+        (FixtureState.delta.matches_regex(r"^el$"), True),  # "el" matches the regex exactly
+        (FixtureState.delta.matches_regex(r"^E.*"), False),  # Case-sensitive mismatch
     ],
     ids=[
         "or",
@@ -122,6 +126,10 @@ class DummyNode(BaseNode[FixtureState]):
         "accessor",
         "constants",
         "list_index",
+        "regex_match_hello",
+        "regex_no_match_hello",
+        "regex_exact_match",
+        "regex_case_mismatch",
     ],
 )
 def test_resolve_value__happy_path(descriptor, expected_value):

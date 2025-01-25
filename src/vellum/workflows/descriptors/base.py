@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from vellum.workflows.expressions.is_undefined import IsUndefinedExpression
     from vellum.workflows.expressions.less_than import LessThanExpression
     from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualToExpression
+    from vellum.workflows.expressions.matches_regex import MatchesRegexExpression
     from vellum.workflows.expressions.not_between import NotBetweenExpression
     from vellum.workflows.expressions.not_in import NotInExpression
     from vellum.workflows.expressions.or_ import OrExpression
@@ -349,3 +350,8 @@ class BaseDescriptor(Generic[_T]):
         from vellum.workflows.expressions.is_not_blank import IsNotBlankExpression
 
         return IsNotBlankExpression(expression=self)
+
+    def matches_regex(self, regex: "Union[BaseDescriptor[str], str]") -> "MatchesRegexExpression":
+        from vellum.workflows.expressions.matches_regex import MatchesRegexExpression
+
+        return MatchesRegexExpression(expression=self, regex=regex)

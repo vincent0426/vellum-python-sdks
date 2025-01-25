@@ -13,6 +13,17 @@ LOCKFILE_PATH = "vellum.lock.json"
 PYPROJECT_TOML_PATH = "pyproject.toml"
 
 
+class WorkspaceConfig(UniversalBaseModel):
+    name: str
+    api_key: str
+
+    def merge(self, other: "WorkspaceConfig") -> "WorkspaceConfig":
+        return WorkspaceConfig(name=self.name or other.name, api_key=self.api_key or other.api_key)
+
+
+DEFAULT_WORKSPACE_CONFIG = WorkspaceConfig(name="default", api_key="VELLUM_API_KEY")
+
+
 class WorkflowDeploymentConfig(UniversalBaseModel):
     id: Optional[UUID] = None
     label: Optional[str] = None
@@ -37,6 +48,7 @@ class WorkflowConfig(UniversalBaseModel):
     deployments: List[WorkflowDeploymentConfig] = field(default_factory=list)
     container_image_name: Optional[str] = None
     container_image_tag: Optional[str] = None
+    workspace: str = DEFAULT_WORKSPACE_CONFIG.name
 
     def merge(self, other: "WorkflowConfig") -> "WorkflowConfig":
         self_deployment_by_id = {
@@ -72,12 +84,14 @@ class WorkflowConfig(UniversalBaseModel):
             deployments=merged_deployments,
             container_image_tag=self.container_image_tag or other.container_image_tag,
             container_image_name=self.container_image_name or other.container_image_name,
+            workspace=self.workspace or other.workspace,
         )
 
 
 class VellumCliConfig(UniversalBaseModel):
     version: Literal["1.0"] = "1.0"
     workflows: List[WorkflowConfig] = field(default_factory=list)
+    workspaces: List[WorkspaceConfig] = field(default_factory=list)
 
     def save(self) -> None:
         lockfile_path = os.path.join(os.getcwd(), LOCKFILE_PATH)
@@ -102,7 +116,21 @@ class VellumCliConfig(UniversalBaseModel):
             elif other_workflow:
                 merged_workflows.append(other_workflow)
 
-        return VellumCliConfig(workflows=merged_workflows, version=self.version)
+        self_workspace_by_name = {workspace.name: workspace for workspace in self.workspaces}
+        other_workspace_by_name = {workspace.name: workspace for workspace in other.workspaces}
+        all_names = sorted(set(self_workspace_by_name.keys()).union(set(other_workspace_by_name.keys())))
+        merged_workspaces = []
+        for name in all_names:
+            self_workspace = self_workspace_by_name.get(name)
+            other_workspace = other_workspace_by_name.get(name)
+            if self_workspace and other_workspace:
+                merged_workspaces.append(self_workspace.merge(other_workspace))
+            elif self_workspace:
+                merged_workspaces.append(self_workspace)
+            elif other_workspace:
+                merged_workspaces.append(other_workspace)
+
+        return VellumCliConfig(workflows=merged_workflows, workspaces=merged_workspaces, version=self.version)
 
 
 def load_vellum_cli_config(root_dir: Optional[str] = None) -> VellumCliConfig:

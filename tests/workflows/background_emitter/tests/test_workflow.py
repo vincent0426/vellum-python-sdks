@@ -1,13 +1,16 @@
 import time
 
-from tests.workflows.background_emitter.workflow import BackgroundEmitterWorkflow
+from tests.workflows.background_emitter.workflow import BackgroundEmitterWorkflow, ExpensiveEmitter
 
 
-def test_workflow__happy_path():
+def test_workflow__happy_path(mocker):
     """
     Test that a Workflow with an expensive data emitter completes without waiting
     for the emitter to complete.
     """
+
+    # MOCK the emit function called by the emitter
+    mock_emit = mocker.patch.object(ExpensiveEmitter, "_emit")
 
     # GIVEN a workflow with an expensive data emitter
     workflow = BackgroundEmitterWorkflow()
@@ -22,7 +25,10 @@ def test_workflow__happy_path():
     # TODO: Remove this once we've resolved `terminal_event.outputs.final_value`
     # from `OutputReference[T]` to `T`.
     # https://app.shortcut.com/vellum/story/4936
-    assert terminal_event.outputs.final_value < 0.02  # type: ignore[operator]
+    assert terminal_event.outputs.final_value < ExpensiveEmitter.delay  # type: ignore[operator]
 
     # AND the workflow itself completed without blocking on the emitter
-    assert end_time - start_time < 0.02
+    assert end_time - start_time < ExpensiveEmitter.delay
+
+    # AND the emitter was called at least once
+    assert mock_emit.call_count > 0, "Emitter was not called"

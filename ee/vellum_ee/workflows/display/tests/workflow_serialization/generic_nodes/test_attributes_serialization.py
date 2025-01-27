@@ -4,6 +4,8 @@ from deepdiff import DeepDiff
 
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -19,11 +21,7 @@ class ConstantValueGenericNode(BaseNode):
 
 
 def test_serialize_node__constant_value(serialize_node):
-    input_id = uuid4()
-    serialized_node = serialize_node(
-        node_class=ConstantValueGenericNode,
-        global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
-    )
+    serialized_node = serialize_node(ConstantValueGenericNode)
 
     assert not DeepDiff(
         {
@@ -58,6 +56,92 @@ def test_serialize_node__constant_value(serialize_node):
                             "value": "hello",
                         },
                     },
+                }
+            ],
+            "outputs": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
+
+
+class ConstantValueReferenceGenericNode(BaseNode):
+    attr: str = ConstantValueReference("hello")
+
+
+def test_serialize_node__constant_value_reference(serialize_node):
+    serialized_node = serialize_node(ConstantValueReferenceGenericNode)
+
+    assert not DeepDiff(
+        {
+            "id": "9271e2b1-f47e-47a4-95ae-51299dedb62f",
+            "label": "ConstantValueReferenceGenericNode",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "ConstantValueReferenceGenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_attributes_serialization",
+                ],
+            },
+            "trigger": {"id": "8cc0b4c4-4ae4-4248-8fd5-bfb2e658eb51", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "fe696d84-47c2-4325-8020-34a1c586a759", "name": "default", "type": "DEFAULT"}],
+            "adornments": None,
+            "attributes": [
+                {
+                    "id": "460aeb68-7369-43d2-9d3d-37caa425611f",
+                    "name": "attr",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "hello"}},
+                }
+            ],
+            "outputs": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
+
+
+class LazyReferenceGenericNode(BaseNode):
+    attr: str = LazyReference(lambda: ConstantValueReference("hello"))
+
+
+def test_serialize_node__lazy_reference(serialize_node):
+    serialized_node = serialize_node(LazyReferenceGenericNode)
+
+    assert not DeepDiff(
+        {
+            "id": "29563b11-bd4d-47b0-b017-372f78aeaef5",
+            "label": "LazyReferenceGenericNode",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "LazyReferenceGenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_attributes_serialization",
+                ],
+            },
+            "trigger": {"id": "56e9791a-078a-4bb7-90bc-a26c3991c70f", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "acb761a0-fcc2-4d21-bc8c-d0d560912c04", "name": "default", "type": "DEFAULT"}],
+            "adornments": None,
+            "attributes": [
+                {
+                    "id": "4370b381-9165-4fb4-881e-480507abe069",
+                    "name": "attr",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "hello"}},
                 }
             ],
             "outputs": [],
@@ -276,6 +360,103 @@ def test_serialize_node__node_execution(serialize_node):
                     "value": {
                         "type": "EXECUTION_COUNTER",
                         "node_id": "c09bd5a6-dc04-4036-90d4-580acd43c71f",
+                    },
+                }
+            ],
+            "outputs": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
+
+
+class CoalesceNodeA(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output: str
+
+
+class CoalesceNodeADisplay(BaseNodeDisplay[CoalesceNodeA]):
+    pass
+
+
+class CoalesceNodeB(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output: str
+
+
+class CoalesceNodeBDisplay(BaseNodeDisplay[CoalesceNodeB]):
+    pass
+
+
+class CoalesceNodeFinal(BaseNode):
+    attr = CoalesceNodeA.Outputs.output.coalesce(CoalesceNodeB.Outputs.output)
+
+
+class CoalesceNodeFinalDisplay(BaseNodeDisplay[CoalesceNodeFinal]):
+    pass
+
+
+def test_serialize_node__coalesce(serialize_node):
+    coalesce_node_a_output_id = uuid4()
+    coalesce_node_b_output_id = uuid4()
+    serialized_node = serialize_node(
+        node_class=CoalesceNodeFinal,
+        global_node_displays={
+            CoalesceNodeA: CoalesceNodeADisplay(),
+            CoalesceNodeB: CoalesceNodeBDisplay(),
+            CoalesceNodeFinal: CoalesceNodeFinalDisplay(),
+        },
+        global_node_output_displays={
+            CoalesceNodeA.Outputs.output: (
+                CoalesceNodeA,
+                NodeOutputDisplay(id=coalesce_node_a_output_id, name="output"),
+            ),
+            CoalesceNodeB.Outputs.output: (
+                CoalesceNodeB,
+                NodeOutputDisplay(id=coalesce_node_b_output_id, name="output"),
+            ),
+        },
+    )
+
+    assert not DeepDiff(
+        {
+            "id": "84d0ce62-afd1-4186-b0e3-5dd8e5ca8b65",
+            "label": "CoalesceNodeFinal",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "CoalesceNodeFinal",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_attributes_serialization",
+                ],
+            },
+            "trigger": {"id": "5165f887-153b-4ecd-9219-1beb3cf4f906", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "08ab456d-f541-4400-8305-e97f30cbe745", "name": "default", "type": "DEFAULT"}],
+            "adornments": None,
+            "attributes": [
+                {
+                    "id": "5a22dd48-9ef3-456b-85b8-7662cf7823eb",
+                    "name": "attr",
+                    "value": {
+                        "type": "BINARY_EXPRESSION",
+                        "lhs": {
+                            "type": "NODE_OUTPUT",
+                            "node_id": "20c340f2-409c-4d31-b44b-eeffd76938d5",
+                            "node_output_id": str(coalesce_node_a_output_id),
+                        },
+                        "operator": "coalesce",
+                        "rhs": {
+                            "type": "NODE_OUTPUT",
+                            "node_id": "9fac3c54-4e75-46ca-a1f2-a80fc6d8ad3f",
+                            "node_output_id": str(coalesce_node_b_output_id),
+                        },
                     },
                 }
             ],

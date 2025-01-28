@@ -23,6 +23,7 @@ from vellum_ee.workflows.display.workflows.vellum_workflow_display import Vellum
 
 def push_command(
     module: Optional[str] = None,
+    workflow_sandbox_id: Optional[str] = None,
     deploy: Optional[bool] = None,
     deployment_label: Optional[str] = None,
     deployment_name: Optional[str] = None,
@@ -39,12 +40,23 @@ def push_command(
     if not config.workflows:
         raise ValueError("No Workflows found in project to push.")
 
-    if len(config.workflows) > 1 and not module:
+    workflow_configs = (
+        [
+            w
+            for w in config.workflows
+            if (module and w.module == module) or (workflow_sandbox_id and w.workflow_sandbox_id == workflow_sandbox_id)
+        ]
+        if module or workflow_sandbox_id
+        else config.workflows
+    )
+
+    if len(workflow_configs) == 0:
+        raise ValueError(f"No workflow config for '{module}' found in project to push.")
+
+    if len(workflow_configs) > 1:
         raise ValueError("Multiple workflows found in project to push. Pushing only a single workflow is supported.")
 
-    workflow_config = next((w for w in config.workflows if w.module == module), None) if module else config.workflows[0]
-    if workflow_config is None:
-        raise ValueError(f"No workflow config for '{module}' found in project to push.")
+    workflow_config = workflow_configs[0]
 
     logger.info(f"Loading workflow from {workflow_config.module}")
     resolved_workspace = workspace or workflow_config.workspace or DEFAULT_WORKSPACE_CONFIG.name
@@ -64,6 +76,15 @@ def push_command(
             workspace=workspace_config.name,
         )
         config.workflows.append(workflow_config)
+
+    if (
+        workflow_sandbox_id
+        and workflow_config.workflow_sandbox_id
+        and workflow_config.workflow_sandbox_id != workflow_sandbox_id
+    ):
+        raise ValueError(
+            f"Workflow sandbox id '{workflow_sandbox_id}' is already associated with '{workflow_config.module}'."
+        )
 
     client = create_vellum_client(
         api_key=api_key,
@@ -138,7 +159,7 @@ def push_command(
             # https://app.shortcut.com/vellum/story/5585
             exec_config=json.dumps(exec_config),
             label=label,
-            workflow_sandbox_id=workflow_config.workflow_sandbox_id,
+            workflow_sandbox_id=workflow_config.workflow_sandbox_id or workflow_sandbox_id,
             artifact=artifact,
             # We should check with fern if we could auto-serialize typed object fields for us
             # https://app.shortcut.com/vellum/story/5568

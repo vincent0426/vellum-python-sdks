@@ -32,6 +32,7 @@ class DocumentsClient:
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
         ordering: typing.Optional[str] = None,
+        search: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PaginatedSlimDocumentList:
         """
@@ -50,6 +51,9 @@ class DocumentsClient:
 
         ordering : typing.Optional[str]
             Which field to use when ordering the results.
+
+        search : typing.Optional[str]
+            A search term.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -77,6 +81,7 @@ class DocumentsClient:
                 "limit": limit,
                 "offset": offset,
                 "ordering": ordering,
+                "search": search,
             },
             request_options=request_options,
         )
@@ -392,6 +397,7 @@ class AsyncDocumentsClient:
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
         ordering: typing.Optional[str] = None,
+        search: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PaginatedSlimDocumentList:
         """
@@ -410,6 +416,9 @@ class AsyncDocumentsClient:
 
         ordering : typing.Optional[str]
             Which field to use when ordering the results.
+
+        search : typing.Optional[str]
+            A search term.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -445,6 +454,7 @@ class AsyncDocumentsClient:
                 "limit": limit,
                 "offset": offset,
                 "ordering": ordering,
+                "search": search,
             },
             request_options=request_options,
         )

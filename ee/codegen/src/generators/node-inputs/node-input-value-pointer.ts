@@ -1,5 +1,6 @@
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { isNil } from "lodash";
 
 import { NodeInputValuePointerRule } from "./node-input-value-pointer-rules/node-input-value-pointer-rule";
 
@@ -16,7 +17,7 @@ export declare namespace NodeInputValuePointer {
 export class NodeInputValuePointer extends AstNode {
   private workflowContext: WorkflowContext;
   private nodeInputValuePointerData: NodeInputValuePointerType;
-  private rules: NodeInputValuePointerRule[];
+  public rules: NodeInputValuePointerRule[];
 
   public constructor(args: NodeInputValuePointer.Args) {
     super();
@@ -28,14 +29,19 @@ export class NodeInputValuePointer extends AstNode {
   }
 
   private generateRules(): NodeInputValuePointerRule[] {
-    return this.nodeInputValuePointerData.rules.map((ruleData) => {
-      const rule = new NodeInputValuePointerRule({
-        workflowContext: this.workflowContext,
-        nodeInputValuePointerRuleData: ruleData,
-      });
-      this.inheritReferences(rule);
-      return rule;
-    });
+    return this.nodeInputValuePointerData.rules
+      .map((ruleData) => {
+        const rule = new NodeInputValuePointerRule({
+          workflowContext: this.workflowContext,
+          nodeInputValuePointerRuleData: ruleData,
+        });
+        if (rule.astNode) {
+          this.inheritReferences(rule);
+          return rule;
+        }
+        return undefined;
+      })
+      .filter((rule) => !isNil(rule));
   }
 
   write(writer: Writer): void {

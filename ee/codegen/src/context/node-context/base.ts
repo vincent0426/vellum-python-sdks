@@ -92,17 +92,29 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
     return getNodeLabel(this.nodeData);
   }
 
-  public getNodeOutputNameById(outputId: string): string {
+  public getNodeOutputNameById(outputId: string): string | undefined {
     // Lazily load node output names
     if (!this.nodeOutputNamesById) {
       this.nodeOutputNamesById = this.getNodeOutputNamesById();
     }
 
     const nodeOutputName = this.nodeOutputNamesById[outputId];
-
     if (!nodeOutputName) {
+      // This handles an edge case where the node references a non-existent subworkflow deployment
+      if (
+        this.nodeData.type === "SUBWORKFLOW" &&
+        this.nodeData.data.variant === "DEPLOYMENT"
+      ) {
+        this.workflowContext.addError(
+          new NodeOutputNotFoundError(
+            `Could not find subworkflow deployment output with id ${outputId}`
+          )
+        );
+        return;
+      }
+
       throw new NodeOutputNotFoundError(
-        `Failed to find output with id '${outputId}'`
+        `Failed to find output value ${this.nodeClassName}.Outputs given id '${outputId}'`
       );
     }
 

@@ -1,5 +1,8 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
-import { beforeEach } from "vitest";
+import { v4 as uuid } from "uuid";
+import { SecretTypeEnum, WorkspaceSecretRead } from "vellum-ai/api";
+import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
+import { beforeEach, describe } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
@@ -36,6 +39,88 @@ describe("ApiNode", () => {
         },
         workflowContext,
       })
+    );
+  });
+
+  const mockWorkspaceSecretDefinition = (workspaceSecret: {
+    id: string;
+    name: string;
+  }) => ({
+    id: workspaceSecret.id,
+    name: workspaceSecret.name,
+    modified: new Date(),
+    label: "mocked-workspace-secret-label",
+    description: "mocked-workspace-secret-description",
+    secretType: SecretTypeEnum.UserDefined,
+  });
+
+  const createNode = async ({
+    workspaceSecret,
+  }: {
+    workspaceSecret: { id: string; name: string };
+  }) => {
+    vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockResolvedValue(
+      mockWorkspaceSecretDefinition(
+        workspaceSecret
+      ) as unknown as WorkspaceSecretRead
+    );
+
+    const nodeData = apiNodeFactory();
+    const bearer_input = uuid();
+    const api_input = uuid();
+    nodeData.inputs.push({
+      id: bearer_input,
+      key: "bearer_token_value",
+      value: {
+        rules: [
+          {
+            type: "WORKSPACE_SECRET",
+            data: {
+              type: "STRING",
+              workspaceSecretId: workspaceSecret.id,
+            },
+          },
+        ],
+        combinator: "OR",
+      },
+    });
+    nodeData.inputs.push({
+      id: api_input,
+      key: "api_key_header_value",
+      value: {
+        rules: [
+          {
+            type: "WORKSPACE_SECRET",
+            data: {
+              type: "STRING",
+              workspaceSecretId: workspaceSecret.id,
+            },
+          },
+        ],
+        combinator: "OR",
+      },
+    });
+    nodeData.data.bearerTokenValueInputId = bearer_input;
+    nodeData.data.apiKeyHeaderValueInputId = api_input;
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as ApiNodeContext;
+
+    return new ApiNode({
+      workflowContext,
+      nodeContext,
+    });
+  };
+
+  describe("basic auth secret node", () => {
+    it.each([{ id: "1234", name: "test-secret" }])(
+      "secret ids should show names",
+      async (workspaceSecret: { id: string; name: string }) => {
+        node = await createNode({ workspaceSecret });
+        node.getNodeFile().write(writer);
+        expect(await writer.toStringFormatted()).toMatchSnapshot();
+      }
     );
   });
 

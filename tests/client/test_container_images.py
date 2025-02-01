@@ -20,7 +20,7 @@ async def test_list_(client: Vellum, async_client: AsyncVellum) -> None:
                 "modified": "2024-01-15T09:30:00Z",
                 "repository": "repository",
                 "sha": "sha",
-                "tags": ["tags"],
+                "tags": [{"name": "name", "modified": "2024-01-15T09:30:00Z"}],
             }
         ],
     }
@@ -39,7 +39,7 @@ async def test_list_(client: Vellum, async_client: AsyncVellum) -> None:
                     "modified": "datetime",
                     "repository": None,
                     "sha": None,
-                    "tags": ("list", {0: None}),
+                    "tags": ("list", {0: {"name": None, "modified": "datetime"}}),
                 }
             },
         ),
@@ -60,7 +60,7 @@ async def test_retrieve(client: Vellum, async_client: AsyncVellum) -> None:
         "modified": "2024-01-15T09:30:00Z",
         "repository": "repository",
         "sha": "sha",
-        "tags": ["tags"],
+        "tags": [{"name": "name", "modified": "2024-01-15T09:30:00Z"}],
     }
     expected_types: typing.Any = {
         "id": None,
@@ -70,7 +70,7 @@ async def test_retrieve(client: Vellum, async_client: AsyncVellum) -> None:
         "modified": "datetime",
         "repository": None,
         "sha": None,
-        "tags": ("list", {0: None}),
+        "tags": ("list", {0: {"name": None, "modified": "datetime"}}),
     }
     response = client.container_images.retrieve(id="id")
     validate_response(response, expected_response, expected_types)
@@ -102,7 +102,7 @@ async def test_push_container_image(client: Vellum, async_client: AsyncVellum) -
         "modified": "2024-01-15T09:30:00Z",
         "repository": "repository",
         "sha": "sha",
-        "tags": ["tags"],
+        "tags": [{"name": "name", "modified": "2024-01-15T09:30:00Z"}],
     }
     expected_types: typing.Any = {
         "id": None,
@@ -112,7 +112,7 @@ async def test_push_container_image(client: Vellum, async_client: AsyncVellum) -
         "modified": "datetime",
         "repository": None,
         "sha": None,
-        "tags": ("list", {0: None}),
+        "tags": ("list", {0: {"name": None, "modified": "datetime"}}),
     }
     response = client.container_images.push_container_image(name="name", sha="sha", tags=["tags"])
     validate_response(response, expected_response, expected_types)

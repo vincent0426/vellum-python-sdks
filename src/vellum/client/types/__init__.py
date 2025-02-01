@@ -68,6 +68,7 @@ from .components_schemas_pdf_search_result_meta_source_request import Components
 from .condition_combinator import ConditionCombinator
 from .conditional_node_result import ConditionalNodeResult
 from .conditional_node_result_data import ConditionalNodeResultData
+from .container_image_container_image_tag import ContainerImageContainerImageTag
 from .container_image_read import ContainerImageRead
 from .create_test_suite_test_case_request import CreateTestSuiteTestCaseRequest
 from .deployment_history_item import DeploymentHistoryItem
@@ -577,6 +578,7 @@ __all__ = [
     "ConditionCombinator",
     "ConditionalNodeResult",
     "ConditionalNodeResultData",
+    "ContainerImageContainerImageTag",
     "ContainerImageRead",
     "CreateTestSuiteTestCaseRequest",
     "DeploymentHistoryItem",

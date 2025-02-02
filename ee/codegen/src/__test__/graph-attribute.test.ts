@@ -766,10 +766,8 @@ describe("Workflow", () => {
         [[secondInnerCheckNode, "if_port"], finalCheckNode],
         [[secondInnerCheckNode, "else_port"], outerOutputNode],
       ]);
-    });
-
-    /**
-     * Currently creating the following incorrect graph:
+      /**
+       * Currently creating the following incorrect graph:
 {
     FirstCheckNode.Ports.if_port
     >> {
@@ -784,8 +782,37 @@ describe("Workflow", () => {
         OuterOutputNode,
     }
 )
-     * This graph incorrectly adds `OuterOutputNode` to the right hand side set, instead of
-     * creating the proper `else` edge for `SecondInnerCheckNode`.
-     */
+        * This graph incorrectly adds `OuterOutputNode` to the right hand side set, instead of
+        * creating the proper `else` edge for `SecondInnerCheckNode`.
+        */
+    });
+
+    it.skip("Should handle an else case within a conditioned set", async () => {
+      const firstCheckNode = genericNodeFactory({
+        name: "FirstCheckNode",
+        nodePorts: nodePortsFactory(),
+      });
+
+      const firstOutputNode = genericNodeFactory({
+        name: "FirstOutputNode",
+      });
+
+      const secondCheckNode = genericNodeFactory({
+        name: "SecondInnerCheckNode",
+        nodePorts: nodePortsFactory(),
+      });
+
+      const secondOutputNode = genericNodeFactory({
+        name: "SecondOutputNode",
+      });
+
+      await runGraphTest([
+        [entrypointNode, firstCheckNode],
+        [[firstCheckNode, "if_port"], secondCheckNode],
+        [[firstCheckNode, "else_port"], firstOutputNode],
+        [[secondCheckNode, "if_port"], firstOutputNode],
+        [[secondCheckNode, "else_port"], secondOutputNode],
+      ]);
+    });
   });
 });

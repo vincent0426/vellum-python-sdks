@@ -64,11 +64,11 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
                 );
               }
               const key = new NodeInput({
-                workflowContext: this.workflowContext,
+                nodeContext: this.nodeContext,
                 nodeInputData: keyInput,
               });
               const value = new NodeInput({
-                workflowContext: this.workflowContext,
+                nodeContext: this.nodeContext,
                 nodeInputData: valueInput,
               });
 
@@ -286,7 +286,7 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
                 );
               }
               const key = new NodeInput({
-                workflowContext: this.workflowContext,
+                nodeContext: this.nodeContext,
                 nodeInputData: nodeInput,
               });
 
@@ -316,7 +316,7 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
                 );
               }
               const key = new NodeInput({
-                workflowContext: this.workflowContext,
+                nodeContext: this.nodeContext,
                 nodeInputData: nodeInput,
               });
 

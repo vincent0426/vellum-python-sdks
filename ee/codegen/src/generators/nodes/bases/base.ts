@@ -156,7 +156,7 @@ export abstract class BaseNode<
     this.nodeData.inputs.forEach((nodeInputData) => {
       try {
         const nodeInput = codegen.nodeInput({
-          workflowContext: this.workflowContext,
+          nodeContext: this.nodeContext,
           nodeInputData,
         });
 

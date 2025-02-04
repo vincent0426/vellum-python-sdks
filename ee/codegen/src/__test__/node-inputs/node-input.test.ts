@@ -1,17 +1,17 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
-import { workflowContextFactory } from "src/__test__/helpers";
+import { nodeContextFactory } from "src/__test__/helpers";
 import * as codegen from "src/codegen";
-import { WorkflowContext } from "src/context";
-import { NodeInput as NodeInputType } from "src/types/vellum";
+import { BaseNodeContext } from "src/context/node-context/base";
+import { NodeInput as NodeInputType, WorkflowDataNode } from "src/types/vellum";
 
 describe("NodeInput", () => {
   let writer: Writer;
-  let workflowContext: WorkflowContext;
+  let nodeContext: BaseNodeContext<WorkflowDataNode>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     writer = new Writer();
-    workflowContext = workflowContextFactory();
+    nodeContext = await nodeContextFactory();
   });
 
   it("should generate correct Python code", async () => {
@@ -33,7 +33,7 @@ describe("NodeInput", () => {
     };
 
     const nodeInput = codegen.nodeInput({
-      workflowContext: workflowContext,
+      nodeContext,
       nodeInputData,
     });
 

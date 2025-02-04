@@ -30,6 +30,17 @@ describe("WorkflowValueDescriptor", () => {
       })
     );
 
+    workflowContext.addInputVariableContext(
+      inputVariableContextFactory({
+        inputVariableData: {
+          id: "input-2",
+          key: "another_count",
+          type: "NUMBER",
+        },
+        workflowContext,
+      })
+    );
+
     vi.spyOn(workflowContext, "getNodeContext").mockReturnValue({
       nodeClassName: "TestNode",
       path: ["nodes", "test-node-path"],
@@ -146,6 +157,82 @@ describe("WorkflowValueDescriptor", () => {
         },
       };
 
+      const valueDescriptor = new WorkflowValueDescriptor({
+        workflowValueDescriptor: descriptor,
+        workflowContext,
+      });
+
+      valueDescriptor.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("expressions that begin with constant values", () => {
+    it("generates unary expression beginning with constant value reference", async () => {
+      const descriptor: WorkflowValueDescriptorType = {
+        type: "UNARY_EXPRESSION",
+        operator: "null",
+        lhs: {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "STRING",
+            value: "Hello, World!",
+          },
+        },
+      };
+
+      const valueDescriptor = new WorkflowValueDescriptor({
+        workflowValueDescriptor: descriptor,
+        workflowContext,
+      });
+
+      valueDescriptor.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+    it("generates binary expression beginning with constant value reference", async () => {
+      const descriptor: WorkflowValueDescriptorType = {
+        type: "BINARY_EXPRESSION",
+        operator: "=",
+        lhs: {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "STRING",
+            value: "Hello, World!",
+          },
+        },
+        rhs: {
+          type: "WORKFLOW_INPUT",
+          inputVariableId: "input-1",
+        },
+      };
+      const valueDescriptor = new WorkflowValueDescriptor({
+        workflowValueDescriptor: descriptor,
+        workflowContext,
+      });
+
+      valueDescriptor.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+    it("generates ternary expression beginning with constant value reference", async () => {
+      const descriptor: WorkflowValueDescriptorType = {
+        type: "TERNARY_EXPRESSION",
+        operator: "between",
+        base: {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "NUMBER",
+            value: 123,
+          },
+        },
+        lhs: {
+          type: "WORKFLOW_INPUT",
+          inputVariableId: "input-1",
+        },
+        rhs: {
+          type: "WORKFLOW_INPUT",
+          inputVariableId: "input-2",
+        },
+      };
       const valueDescriptor = new WorkflowValueDescriptor({
         workflowValueDescriptor: descriptor,
         workflowContext,

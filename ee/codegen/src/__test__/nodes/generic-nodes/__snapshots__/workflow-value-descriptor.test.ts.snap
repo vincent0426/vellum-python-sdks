@@ -19,3 +19,18 @@ exports[`WorkflowValueDescriptor > expressions > generates unary expression with
 "Inputs.count.is_null()
 "
 `;
+
+exports[`WorkflowValueDescriptor > expressions that begin with constant values > generates binary expression beginning with constant value reference 1`] = `
+"ConstantValueReference("Hello, World!").equals(Inputs.count)
+"
+`;
+
+exports[`WorkflowValueDescriptor > expressions that begin with constant values > generates ternary expression beginning with constant value reference 1`] = `
+"ConstantValueReference(123).between(Inputs.count, Inputs.another_count)
+"
+`;
+
+exports[`WorkflowValueDescriptor > expressions that begin with constant values > generates unary expression beginning with constant value reference 1`] = `
+"ConstantValueReference("Hello, World!").is_null()
+"
+`;

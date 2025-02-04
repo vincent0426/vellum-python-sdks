@@ -2,7 +2,9 @@ import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
+import { VELLUM_WORKFLOW_CONSTANTS_PATH } from "src/constants";
 import { NodeAttributeGenerationError } from "src/generators/errors";
+import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 
 export declare namespace Expression {
   interface Args {
@@ -49,13 +51,17 @@ export class Expression extends AstNode {
     lhs: AstNode,
     rhs: AstNode | undefined
   ): string {
+    let rawLhs = base;
     if (!rhs) {
       throw new NodeAttributeGenerationError(
         "rhs must be defined if base is defined"
       );
     }
-    this.inheritReferences(base);
-    return `${base.toString()}.${operator}(${lhs.toString()}, ${rhs.toString()})`;
+    if (this.isConstantValueReference(base)) {
+      rawLhs = this.generateLhsAsConstantReference(base);
+    }
+    this.inheritReferences(rawLhs);
+    return `${rawLhs.toString()}.${operator}(${lhs.toString()}, ${rhs.toString()})`;
   }
 
   private generateStandardExpression(
@@ -63,8 +69,36 @@ export class Expression extends AstNode {
     operator: string,
     rhs: AstNode | undefined
   ): string {
+    let rawLhs = lhs;
+    if (this.isConstantValueReference(lhs)) {
+      rawLhs = this.generateLhsAsConstantReference(lhs);
+    }
     const rhsExpression = rhs ? `(${rhs.toString()})` : "()";
-    return `${lhs.toString()}.${operator}${rhsExpression}`;
+    return `${rawLhs.toString()}.${operator}${rhsExpression}`;
+  }
+
+  // We are assuming that the expression contains "good data". If the expression contains data
+  // where the generated expression is not correct, update the logic here with guardrails similar to the UI
+  private generateLhsAsConstantReference(lhs: AstNode): AstNode {
+    const constantValueReference = python.reference({
+      name: "ConstantValueReference",
+      modulePath: VELLUM_WORKFLOW_CONSTANTS_PATH,
+    });
+    return python.instantiateClass({
+      classReference: constantValueReference,
+      arguments_: [
+        python.methodArgument({
+          value: lhs,
+        }),
+      ],
+    });
+  }
+
+  private isConstantValueReference(lhs: AstNode): boolean {
+    return (
+      lhs instanceof WorkflowValueDescriptorReference &&
+      lhs.workflowValueReferencePointer === "CONSTANT_VALUE"
+    );
   }
 
   public write(writer: Writer) {

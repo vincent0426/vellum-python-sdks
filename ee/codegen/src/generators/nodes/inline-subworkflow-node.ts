@@ -10,6 +10,7 @@ import {
   SubworkflowNode as SubworkflowNodeType,
   WorkflowRawData,
 } from "src/types/vellum";
+import { getNodeOutputIdFromNodeOutputWorkflowReference } from "src/utils/nodes";
 
 export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
   SubworkflowNodeType,
@@ -126,7 +127,14 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
       initializer: python.TypeInstantiation.dict(
         nestedWorkflowContext.workflowOutputContexts.map((outputContext) => {
           const outputName = outputContext.name;
-          const terminalNodeData = outputContext.getFinalOutputNodeData().data;
+          const finalOutput = outputContext.getFinalOutputNodeData();
+          let outputId;
+          if ("type" in finalOutput) {
+            outputId = finalOutput.data.outputId;
+          } else {
+            outputId =
+              getNodeOutputIdFromNodeOutputWorkflowReference(finalOutput);
+          }
 
           return {
             key: python.reference({
@@ -144,13 +152,11 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
               arguments_: [
                 python.methodArgument({
                   name: "id",
-                  value: python.TypeInstantiation.uuid(
-                    terminalNodeData.outputId
-                  ),
+                  value: python.TypeInstantiation.uuid(outputId),
                 }),
                 python.methodArgument({
                   name: "name",
-                  value: python.TypeInstantiation.str(terminalNodeData.name),
+                  value: python.TypeInstantiation.str(outputName),
                 }),
               ],
             }),

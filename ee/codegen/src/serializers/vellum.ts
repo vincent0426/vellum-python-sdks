@@ -115,6 +115,7 @@ import {
   VellumSecretWorkflowReference,
   ExecutionCounterWorkflowReference,
   WorkflowStateVariableWorkflowReference,
+  WorkflowOutputValue,
 } from "src/types/vellum";
 
 const CacheConfigSerializer = objectSchema({
@@ -1953,6 +1954,7 @@ export const GenericNodeSerializer: ObjectSchema<
   Omit<GenericNode, "type">
 > = objectSchema({
   id: stringSchema(),
+  label: stringSchema(),
   displayData: propertySchema(
     "display_data",
     GenericNodeDisplayDataSerializer.optional()
@@ -1969,6 +1971,7 @@ export const GenericNodeSerializer: ObjectSchema<
 export declare namespace GenericNodeSerializer {
   interface Raw extends BaseWorkflowNodeSerializer.Raw {
     id: string;
+    label: string;
     base: CodeResourceDefinitionSerializer.Raw;
     display_data?: {
       position?: {
@@ -2048,6 +2051,21 @@ export declare namespace WorkflowEdgeSerializer {
   }
 }
 
+export declare namespace WorkflowOutputValueSerializer {
+  interface Raw {
+    output_variable_id: string;
+    value: WorkflowValueDescriptorSerializer.Raw;
+  }
+}
+
+export const WorkflowOutputValueSerializer: ObjectSchema<
+  WorkflowOutputValueSerializer.Raw,
+  WorkflowOutputValue
+> = objectSchema({
+  outputVariableId: propertySchema("output_variable_id", stringSchema()),
+  value: WorkflowValueDescriptorSerializer,
+});
+
 export const WorkflowRawDataSerializer: ObjectSchema<
   WorkflowRawDataSerializer.Raw,
   WorkflowRawData
@@ -2056,6 +2074,10 @@ export const WorkflowRawDataSerializer: ObjectSchema<
   edges: listSchema(workflowEdgeSerializer),
   displayData: propertySchema("display_data", anySchema()),
   definition: CodeResourceDefinitionSerializer.optional(),
+  outputValues: propertySchema(
+    "output_values",
+    listSchema(WorkflowOutputValueSerializer).optional()
+  ),
 });
 
 export declare namespace WorkflowRawDataSerializer {
@@ -2065,6 +2087,7 @@ export declare namespace WorkflowRawDataSerializer {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     display_data?: any;
     definition?: CodeResourceDefinitionSerializer.Raw | null;
+    output_values?: WorkflowOutputValueSerializer.Raw[] | null;
   }
 }
 

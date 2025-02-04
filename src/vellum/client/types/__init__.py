@@ -96,6 +96,10 @@ from .ephemeral_prompt_cache_config_type_enum import EphemeralPromptCacheConfigT
 from .error_input import ErrorInput
 from .error_vellum_value import ErrorVellumValue
 from .error_vellum_value_request import ErrorVellumValueRequest
+from .execute_api_request_bearer_token import ExecuteApiRequestBearerToken
+from .execute_api_request_body import ExecuteApiRequestBody
+from .execute_api_request_headers_value import ExecuteApiRequestHeadersValue
+from .execute_api_response import ExecuteApiResponse
 from .execute_prompt_event import ExecutePromptEvent
 from .execute_prompt_response import ExecutePromptResponse
 from .execute_workflow_response import ExecuteWorkflowResponse
@@ -191,6 +195,7 @@ from .metadata_filter_config_request import MetadataFilterConfigRequest
 from .metadata_filter_rule_combinator import MetadataFilterRuleCombinator
 from .metadata_filter_rule_request import MetadataFilterRuleRequest
 from .metadata_filters_request import MetadataFiltersRequest
+from .method_enum import MethodEnum
 from .metric_definition_execution import MetricDefinitionExecution
 from .metric_definition_history_item import MetricDefinitionHistoryItem
 from .metric_definition_input import MetricDefinitionInput
@@ -461,6 +466,7 @@ from .vellum_error_code_enum import VellumErrorCodeEnum
 from .vellum_error_request import VellumErrorRequest
 from .vellum_image import VellumImage
 from .vellum_image_request import VellumImageRequest
+from .vellum_secret import VellumSecret
 from .vellum_value import VellumValue
 from .vellum_value_logical_condition_group_request import VellumValueLogicalConditionGroupRequest
 from .vellum_value_logical_condition_request import VellumValueLogicalConditionRequest
@@ -606,6 +612,10 @@ __all__ = [
     "ErrorInput",
     "ErrorVellumValue",
     "ErrorVellumValueRequest",
+    "ExecuteApiRequestBearerToken",
+    "ExecuteApiRequestBody",
+    "ExecuteApiRequestHeadersValue",
+    "ExecuteApiResponse",
     "ExecutePromptEvent",
     "ExecutePromptResponse",
     "ExecuteWorkflowResponse",
@@ -697,6 +707,7 @@ __all__ = [
     "MetadataFilterRuleCombinator",
     "MetadataFilterRuleRequest",
     "MetadataFiltersRequest",
+    "MethodEnum",
     "MetricDefinitionExecution",
     "MetricDefinitionHistoryItem",
     "MetricDefinitionInput",
@@ -951,6 +962,7 @@ __all__ = [
     "VellumErrorRequest",
     "VellumImage",
     "VellumImageRequest",
+    "VellumSecret",
     "VellumValue",
     "VellumValueLogicalConditionGroupRequest",
     "VellumValueLogicalConditionRequest",

@@ -21,17 +21,22 @@ from .resources.workflow_sandboxes.client import WorkflowSandboxesClient
 from .resources.workflows.client import WorkflowsClient
 from .resources.workspace_secrets.client import WorkspaceSecretsClient
 from .resources.workspaces.client import WorkspacesClient
+from .types.method_enum import MethodEnum
+from .types.execute_api_request_body import ExecuteApiRequestBody
+from .types.execute_api_request_headers_value import ExecuteApiRequestHeadersValue
+from .types.execute_api_request_bearer_token import ExecuteApiRequestBearerToken
+from .core.request_options import RequestOptions
+from .types.execute_api_response import ExecuteApiResponse
+from .core.serialization import convert_and_respect_annotation_metadata
+from .core.pydantic_utilities import parse_obj_as
+from json.decoder import JSONDecodeError
+from .core.api_error import ApiError
 from .types.code_execution_runtime import CodeExecutionRuntime
 from .types.code_executor_input import CodeExecutorInput
 from .types.code_execution_package import CodeExecutionPackage
 from .types.vellum_variable_type import VellumVariableType
-from .core.request_options import RequestOptions
 from .types.code_executor_response import CodeExecutorResponse
-from .core.serialization import convert_and_respect_annotation_metadata
-from .core.pydantic_utilities import parse_obj_as
 from .errors.bad_request_error import BadRequestError
-from json.decoder import JSONDecodeError
-from .core.api_error import ApiError
 from .types.prompt_deployment_input_request import PromptDeploymentInputRequest
 from .types.prompt_deployment_expand_meta_request import PromptDeploymentExpandMetaRequest
 from .types.raw_prompt_execution_overrides_request import RawPromptExecutionOverridesRequest
@@ -148,6 +153,82 @@ class Vellum:
         self.workflows = WorkflowsClient(client_wrapper=self._client_wrapper)
         self.workspace_secrets = WorkspaceSecretsClient(client_wrapper=self._client_wrapper)
         self.workspaces = WorkspacesClient(client_wrapper=self._client_wrapper)
+
+    def execute_api(
+        self,
+        *,
+        url: str,
+        method: typing.Optional[MethodEnum] = OMIT,
+        body: typing.Optional[ExecuteApiRequestBody] = OMIT,
+        headers: typing.Optional[typing.Dict[str, ExecuteApiRequestHeadersValue]] = OMIT,
+        bearer_token: typing.Optional[ExecuteApiRequestBearerToken] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ExecuteApiResponse:
+        """
+        Parameters
+        ----------
+        url : str
+
+        method : typing.Optional[MethodEnum]
+
+        body : typing.Optional[ExecuteApiRequestBody]
+
+        headers : typing.Optional[typing.Dict[str, ExecuteApiRequestHeadersValue]]
+
+        bearer_token : typing.Optional[ExecuteApiRequestBearerToken]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        ExecuteApiResponse
+
+
+        Examples
+        --------
+        from vellum import Vellum
+
+        client = Vellum(
+            api_key="YOUR_API_KEY",
+        )
+        client.execute_api(
+            url="url",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "v1/execute-api",
+            base_url=self._client_wrapper.get_environment().default,
+            method="POST",
+            json={
+                "url": url,
+                "method": method,
+                "body": convert_and_respect_annotation_metadata(
+                    object_=body, annotation=ExecuteApiRequestBody, direction="write"
+                ),
+                "headers": convert_and_respect_annotation_metadata(
+                    object_=headers, annotation=typing.Dict[str, ExecuteApiRequestHeadersValue], direction="write"
+                ),
+                "bearer_token": convert_and_respect_annotation_metadata(
+                    object_=bearer_token, annotation=ExecuteApiRequestBearerToken, direction="write"
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    ExecuteApiResponse,
+                    parse_obj_as(
+                        type_=ExecuteApiResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def execute_code(
         self,
@@ -1413,6 +1494,90 @@ class AsyncVellum:
         self.workflows = AsyncWorkflowsClient(client_wrapper=self._client_wrapper)
         self.workspace_secrets = AsyncWorkspaceSecretsClient(client_wrapper=self._client_wrapper)
         self.workspaces = AsyncWorkspacesClient(client_wrapper=self._client_wrapper)
+
+    async def execute_api(
+        self,
+        *,
+        url: str,
+        method: typing.Optional[MethodEnum] = OMIT,
+        body: typing.Optional[ExecuteApiRequestBody] = OMIT,
+        headers: typing.Optional[typing.Dict[str, ExecuteApiRequestHeadersValue]] = OMIT,
+        bearer_token: typing.Optional[ExecuteApiRequestBearerToken] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ExecuteApiResponse:
+        """
+        Parameters
+        ----------
+        url : str
+
+        method : typing.Optional[MethodEnum]
+
+        body : typing.Optional[ExecuteApiRequestBody]
+
+        headers : typing.Optional[typing.Dict[str, ExecuteApiRequestHeadersValue]]
+
+        bearer_token : typing.Optional[ExecuteApiRequestBearerToken]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        ExecuteApiResponse
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum
+
+        client = AsyncVellum(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.execute_api(
+                url="url",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "v1/execute-api",
+            base_url=self._client_wrapper.get_environment().default,
+            method="POST",
+            json={
+                "url": url,
+                "method": method,
+                "body": convert_and_respect_annotation_metadata(
+                    object_=body, annotation=ExecuteApiRequestBody, direction="write"
+                ),
+                "headers": convert_and_respect_annotation_metadata(
+                    object_=headers, annotation=typing.Dict[str, ExecuteApiRequestHeadersValue], direction="write"
+                ),
+                "bearer_token": convert_and_respect_annotation_metadata(
+                    object_=bearer_token, annotation=ExecuteApiRequestBearerToken, direction="write"
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    ExecuteApiResponse,
+                    parse_obj_as(
+                        type_=ExecuteApiResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def execute_code(
         self,

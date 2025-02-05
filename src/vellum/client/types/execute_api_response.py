@@ -11,7 +11,9 @@ import pydantic
 class ExecuteApiResponse(UniversalBaseModel):
     status_code: int
     text: str
-    json_: typing_extensions.Annotated[typing.Dict[str, typing.Optional[typing.Any]], FieldMetadata(alias="json")]
+    json_: typing_extensions.Annotated[
+        typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]], FieldMetadata(alias="json")
+    ] = None
     headers: typing.Dict[str, str]
 
     if IS_PYDANTIC_V2:

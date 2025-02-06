@@ -16,6 +16,8 @@ import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { BaseState } from "src/generators/base-state";
 import {
   BaseCodegenError,
+  NodeNotFoundError,
+  NodePortGenerationError,
   WorkflowGenerationError,
 } from "src/generators/errors";
 import { GraphAttribute } from "src/generators/graph-attribute";
@@ -388,8 +390,8 @@ export class Workflow {
             sourcePortContext =
               this.workflowContext.getPortContextById(sourcePortId);
           } catch (e) {
-            if (e instanceof BaseCodegenError) {
-              this.workflowContext.addError(e);
+            if (e instanceof NodePortGenerationError) {
+              console.warn(e.message);
             } else {
               throw e;
             }
@@ -402,8 +404,8 @@ export class Workflow {
           try {
             targetNode = this.workflowContext.getNodeContext(targetNodeId);
           } catch (e) {
-            if (e instanceof BaseCodegenError) {
-              this.workflowContext.addError(e);
+            if (e instanceof NodeNotFoundError) {
+              console.warn(e.message);
             } else {
               throw e;
             }

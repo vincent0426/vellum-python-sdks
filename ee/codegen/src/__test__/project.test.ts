@@ -922,7 +922,7 @@ baz = foo + bar
       output_variables: [],
       runner_config: {},
     };
-    it.skip("should generate a proper Lazy Reference for the first node", async () => {
+    it("should generate a proper Lazy Reference for the first node", async () => {
       const project = new WorkflowProjectGenerator({
         absolutePathToOutputDirectory: tempDir,
         workflowVersionExecConfigData: displayData,

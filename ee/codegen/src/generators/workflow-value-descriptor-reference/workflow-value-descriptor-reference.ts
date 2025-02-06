@@ -27,8 +27,8 @@ export declare namespace WorkflowValueDescriptorReference {
 }
 
 export class WorkflowValueDescriptorReference extends AstNode {
-  private workflowContext: WorkflowContext;
   private nodeContext?: BaseNodeContext<WorkflowDataNode>;
+  private workflowContext: WorkflowContext;
   public readonly workflowValueReferencePointer: WorkflowValueDescriptorReferenceType["type"];
   private iterableConfig?: IterableConfig;
   public astNode:
@@ -38,6 +38,7 @@ export class WorkflowValueDescriptorReference extends AstNode {
   constructor(args: WorkflowValueDescriptorReference.Args) {
     super();
 
+    this.nodeContext = args.nodeContext;
     this.workflowContext = args.workflowContext;
     this.nodeContext = args.nodeContext;
     this.workflowValueReferencePointer =
@@ -61,6 +62,7 @@ export class WorkflowValueDescriptorReference extends AstNode {
     switch (referenceType) {
       case "NODE_OUTPUT": {
         const reference = new NodeOutputWorkflowReference({
+          nodeContext: this.nodeContext,
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });
@@ -84,6 +86,7 @@ export class WorkflowValueDescriptorReference extends AstNode {
         return undefined;
       case "CONSTANT_VALUE":
         return new ConstantValueReference({
+          nodeContext: this.nodeContext,
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
           iterableConfig: this.iterableConfig,

@@ -37,6 +37,7 @@ export class WorkflowValueDescriptor extends AstNode {
   public constructor(args: WorkflowValueDescriptor.Args) {
     super();
 
+    this.nodeContext = args.nodeContext;
     this.workflowContext = args.workflowContext;
     this.iterableConfig = args.iterableConfig;
     this.astNode = this.generateWorkflowValueDescriptor(
@@ -60,8 +61,8 @@ export class WorkflowValueDescriptor extends AstNode {
     // Base case
     if (this.isReference(workflowValueDescriptor)) {
       return new WorkflowValueDescriptorReference({
-        workflowContext: this.workflowContext,
         nodeContext: this.nodeContext,
+        workflowContext: this.workflowContext,
         workflowValueReferencePointer: workflowValueDescriptor,
         iterableConfig: this.iterableConfig,
       });

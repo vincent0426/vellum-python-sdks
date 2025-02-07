@@ -1,10 +1,16 @@
+import { DeploymentHistoryItem } from "vellum-ai/api";
+import { Deployments as DeploymentsClient } from "vellum-ai/api/resources/deployments/client/Client";
+
 import { BaseNodeContext } from "src/context/node-context/base";
 import { PortContext } from "src/context/port-context";
 import { PromptNode } from "src/types/vellum";
+import { isVellumErrorWithDetail } from "src/utils/nodes";
 
 export class PromptDeploymentNodeContext extends BaseNodeContext<PromptNode> {
   baseNodeClassName = "PromptDeploymentNode";
   baseNodeDisplayClassName = "BasePromptDeploymentNodeDisplay";
+
+  public deploymentHistoryItem: DeploymentHistoryItem | null = null;
 
   protected getNodeOutputNamesById(): Record<string, string> {
     return {
@@ -24,5 +30,28 @@ export class PromptDeploymentNodeContext extends BaseNodeContext<PromptNode> {
         portId: this.nodeData.data.sourceHandleId,
       }),
     ];
+  }
+
+  async buildProperties(): Promise<void> {
+    if (this.nodeData.data.variant !== "DEPLOYMENT") {
+      return;
+    }
+
+    try {
+      this.deploymentHistoryItem = await new DeploymentsClient({
+        apiKey: this.workflowContext.vellumApiKey,
+      }).deploymentHistoryItemRetrieve(
+        this.nodeData.data.releaseTag,
+        this.nodeData.data.promptDeploymentId
+      );
+    } catch (error) {
+      if (isVellumErrorWithDetail(error)) {
+        console.warn(
+          `Could not find prompt deployment with id: ${this.nodeData.data.promptDeploymentId}, falling back to id`
+        );
+      } else {
+        throw error;
+      }
+    }
   }
 }

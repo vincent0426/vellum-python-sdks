@@ -31,12 +31,25 @@ export class PromptDeploymentNode extends BaseSingleFileNode<
       );
     }
 
-    statements.push(
-      python.field({
-        name: "deployment",
-        initializer: python.TypeInstantiation.str(nodeData.promptDeploymentId),
-      })
-    );
+    if (this.nodeContext.deploymentHistoryItem) {
+      statements.push(
+        python.field({
+          name: "deployment",
+          initializer: python.TypeInstantiation.str(
+            this.nodeContext.deploymentHistoryItem.name
+          ),
+        })
+      );
+    } else {
+      statements.push(
+        python.field({
+          name: "deployment",
+          initializer: python.TypeInstantiation.str(
+            this.nodeData.data.promptDeploymentId
+          ),
+        })
+      );
+    }
 
     statements.push(
       python.field({

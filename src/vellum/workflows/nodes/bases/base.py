@@ -43,7 +43,23 @@ class BaseNodeMeta(type):
         # TODO: Inherit the inner Output classes from every base class.
         #   https://app.shortcut.com/vellum/story/4007/support-auto-inheriting-parent-node-outputs
 
-        if "Outputs" not in dct:
+        if "Outputs" in dct:
+            outputs_class = dct["Outputs"]
+            if not any(issubclass(base, BaseOutputs) for base in outputs_class.__bases__):
+                parent_outputs_class = next(
+                    (base.Outputs for base in bases if hasattr(base, "Outputs")),
+                    BaseOutputs,  # Default to BaseOutputs only if no parent has Outputs
+                )
+
+                # Filter out object from bases while preserving other inheritance
+                filtered_bases = tuple(base for base in outputs_class.__bases__ if base is not object)
+
+                dct["Outputs"] = type(
+                    f"{name}.Outputs",
+                    (parent_outputs_class,) + filtered_bases,
+                    {**outputs_class.__dict__, "__module__": dct["__module__"]},
+                )
+        else:
             for base in reversed(bases):
                 if hasattr(base, "Outputs"):
                     dct["Outputs"] = type(

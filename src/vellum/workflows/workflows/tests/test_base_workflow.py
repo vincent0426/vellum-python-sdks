@@ -8,16 +8,16 @@ from vellum.workflows.workflows.base import BaseWorkflow
 
 def test_base_workflow__inherit_base_outputs():
     class MyNode(BaseNode):
-        class Outputs:
+        class Outputs(BaseNode.Outputs):
             foo: str
 
         def run(self):
-            return self.Outputs(foo="bar")  # type: ignore
+            return self.Outputs(foo="bar")
 
     class MyWorkflow(BaseWorkflow[BaseInputs, BaseState]):
         graph = MyNode
 
-        class Outputs(BaseWorkflow.Outputs):
+        class Outputs:
             output = MyNode.Outputs.foo
 
     # TEST that the Outputs class is a subclass of BaseOutputs
@@ -39,7 +39,7 @@ def test_base_workflow__inherit_base_outputs():
 
 def test_subworkflow__inherit_base_outputs():
     class StartNode(BaseNode):
-        class Outputs(BaseOutputs):
+        class Outputs(BaseNode.Outputs):
             foo: str
 
         def run(self):

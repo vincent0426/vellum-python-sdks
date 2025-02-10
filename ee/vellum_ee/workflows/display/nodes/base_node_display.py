@@ -34,6 +34,7 @@ from vellum.workflows.references import OutputReference
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.lazy import LazyReference
+from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
@@ -371,6 +372,13 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             return {
                 "type": "WORKFLOW_INPUT",
                 "input_variable_id": str(workflow_input_display.id),
+            }
+
+        if isinstance(value, StateValueReference):
+            state_value_display = display_context.global_state_value_displays[value]
+            return {
+                "type": "STATE_VALUE",
+                "state_value_id": str(state_value_display.id),
             }
 
         if isinstance(value, OutputReference):

@@ -21,6 +21,7 @@ def test_serialize_workflow_with_filepath():
     assert serialized_workflow.keys() == {
         "workflow_raw_data",
         "input_variables",
+        "state_variables",
         "output_variables",
     }
 
@@ -261,6 +262,7 @@ def test_serialize_workflow_with_code():
     assert serialized_workflow.keys() == {
         "workflow_raw_data",
         "input_variables",
+        "state_variables",
         "output_variables",
     }
 
@@ -489,6 +491,7 @@ def test_serialize_workflow__try_wrapped():
     assert serialized_workflow.keys() == {
         "workflow_raw_data",
         "input_variables",
+        "state_variables",
         "output_variables",
     }
 

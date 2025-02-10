@@ -18,7 +18,13 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.references import ExternalInputReference, OutputReference, StateValueReference
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.types.stack import Stack
-from vellum.workflows.types.utils import datetime_now, deepcopy_with_exclusions, get_class_by_qualname, infer_types
+from vellum.workflows.types.utils import (
+    datetime_now,
+    deepcopy_with_exclusions,
+    get_class_attr_names,
+    get_class_by_qualname,
+    infer_types,
+)
 
 if TYPE_CHECKING:
     from vellum.workflows.nodes.bases import BaseNode
@@ -46,6 +52,20 @@ class _BaseStateMeta(type):
             return StateValueReference(name=name, types=types, instance=instance)
 
         return super().__getattribute__(name)
+
+    def __iter__(cls) -> Iterator[StateValueReference]:
+        # We iterate through the inheritance hierarchy to find all the StateValueReference attached to this
+        # Inputs class. __mro__ is the method resolution order, which is the order in which base classes are resolved.
+        for resolved_cls in cls.__mro__:
+            attr_names = get_class_attr_names(resolved_cls)
+            for attr_name in attr_names:
+                if attr_name == "meta":
+                    continue
+                attr_value = getattr(resolved_cls, attr_name)
+                if not isinstance(attr_value, (StateValueReference)):
+                    continue
+
+                yield attr_value
 
 
 class _SnapshottableDict(dict, _Snapshottable):

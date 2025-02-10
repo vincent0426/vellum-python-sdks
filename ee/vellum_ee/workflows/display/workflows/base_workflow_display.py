@@ -13,7 +13,7 @@ from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.utils import get_wrapped_node
 from vellum.workflows.ports import Port
-from vellum.workflows.references import OutputReference, WorkflowInputReference
+from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.utils.uuids import uuid4_from_hash
@@ -22,6 +22,8 @@ from vellum_ee.workflows.display.base import (
     EdgeDisplayType,
     EntrypointDisplayOverridesType,
     EntrypointDisplayType,
+    StateValueDisplayOverridesType,
+    StateValueDisplayType,
     WorkflowInputsDisplayOverridesType,
     WorkflowInputsDisplayType,
     WorkflowMetaDisplayOverridesType,
@@ -49,6 +51,8 @@ class BaseWorkflowDisplay(
         WorkflowMetaDisplayOverridesType,
         WorkflowInputsDisplayType,
         WorkflowInputsDisplayOverridesType,
+        StateValueDisplayType,
+        StateValueDisplayOverridesType,
         NodeDisplayType,
         EntrypointDisplayType,
         EntrypointDisplayOverridesType,
@@ -63,6 +67,9 @@ class BaseWorkflowDisplay(
 
     # Used to explicitly specify display data for a workflow's inputs.
     inputs_display: Dict[WorkflowInputReference, WorkflowInputsDisplayOverridesType] = {}
+
+    # Used to explicitly specify display data for a workflow's state values.
+    state_value_displays: Dict[StateValueReference, StateValueDisplayOverridesType] = {}
 
     # Used to explicitly specify display data for a workflow's entrypoints.
     entrypoint_displays: Dict[Type[BaseNode], EntrypointDisplayOverridesType] = {}
@@ -91,6 +98,7 @@ class BaseWorkflowDisplay(
             WorkflowDisplayContext[
                 WorkflowMetaDisplayType,
                 WorkflowInputsDisplayType,
+                StateValueDisplayType,
                 NodeDisplayType,
                 EntrypointDisplayType,
                 WorkflowOutputDisplayType,
@@ -191,6 +199,7 @@ class BaseWorkflowDisplay(
     ) -> WorkflowDisplayContext[
         WorkflowMetaDisplayType,
         WorkflowInputsDisplayType,
+        StateValueDisplayType,
         NodeDisplayType,
         EntrypointDisplayType,
         WorkflowOutputDisplayType,
@@ -244,6 +253,18 @@ class BaseWorkflowDisplay(
             workflow_input_displays[workflow_input] = input_display
             global_workflow_input_displays[workflow_input] = input_display
 
+        state_value_displays: Dict[StateValueReference, StateValueDisplayType] = {}
+        global_state_value_displays = (
+            copy(self._parent_display_context.global_state_value_displays) if self._parent_display_context else {}
+        )
+        for state_value in self._workflow.get_state_class():
+            state_value_display_overrides = self.state_value_displays.get(state_value)
+            state_value_display = self._generate_state_value_display(
+                state_value, overrides=state_value_display_overrides
+            )
+            state_value_displays[state_value] = state_value_display
+            global_state_value_displays[state_value] = state_value_display
+
         entrypoint_displays: Dict[Type[BaseNode], EntrypointDisplayType] = {}
         for entrypoint in self._workflow.get_entrypoints():
             if entrypoint in entrypoint_displays:
@@ -286,6 +307,8 @@ class BaseWorkflowDisplay(
             workflow_display=workflow_display,
             workflow_input_displays=workflow_input_displays,
             global_workflow_input_displays=global_workflow_input_displays,
+            state_value_displays=state_value_displays,
+            global_state_value_displays=global_state_value_displays,
             node_displays=node_displays,
             global_node_output_displays=global_node_output_displays,
             global_node_displays=global_node_displays,
@@ -304,6 +327,12 @@ class BaseWorkflowDisplay(
     def _generate_workflow_input_display(
         self, workflow_input: WorkflowInputReference, overrides: Optional[WorkflowInputsDisplayOverridesType] = None
     ) -> WorkflowInputsDisplayType:
+        pass
+
+    @abstractmethod
+    def _generate_state_value_display(
+        self, state_value: StateValueReference, overrides: Optional[StateValueDisplayOverridesType] = None
+    ) -> StateValueDisplayType:
         pass
 
     @abstractmethod

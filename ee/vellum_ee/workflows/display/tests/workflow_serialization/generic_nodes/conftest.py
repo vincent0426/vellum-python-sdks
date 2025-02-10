@@ -4,10 +4,11 @@ from typing import Any, Dict, Tuple, Type
 
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.output import OutputReference
+from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.types.generics import NodeType
-from vellum_ee.workflows.display.base import WorkflowInputsDisplayType
+from vellum_ee.workflows.display.base import StateValueDisplayType, WorkflowInputsDisplayType
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
@@ -22,6 +23,7 @@ def serialize_node():
         node_class: Type[NodeType],
         base_class: type[BaseNodeDisplay[Any]] = BaseNodeDisplay,
         global_workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = {},
+        global_state_value_displays: Dict[StateValueReference, StateValueDisplayType] = {},
         global_node_displays: Dict[Type[BaseNode], NodeDisplayType] = {},
         global_node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]] = {},
     ) -> JsonObject:
@@ -37,6 +39,7 @@ def serialize_node():
             ),
             node_displays={node_class: node_display},
             global_workflow_input_displays=global_workflow_input_displays,
+            global_state_value_displays=global_state_value_displays,
             global_node_displays=global_node_displays,
             global_node_output_displays=global_node_output_displays,
         )

@@ -6,10 +6,11 @@ from vellum.client.core import UniversalBaseModel
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.ports import Port
-from vellum.workflows.references import OutputReference, WorkflowInputReference
+from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
 from vellum_ee.workflows.display.base import (
     EdgeDisplayType,
     EntrypointDisplayType,
+    StateValueDisplayType,
     WorkflowInputsDisplayType,
     WorkflowMetaDisplayType,
     WorkflowOutputDisplayType,
@@ -41,6 +42,7 @@ class WorkflowDisplayContext(
     Generic[
         WorkflowMetaDisplayType,
         WorkflowInputsDisplayType,
+        StateValueDisplayType,
         NodeDisplayType,
         EntrypointDisplayType,
         WorkflowOutputDisplayType,
@@ -53,6 +55,8 @@ class WorkflowDisplayContext(
     global_workflow_input_displays: Dict[WorkflowInputReference, WorkflowInputsDisplayType] = field(
         default_factory=dict
     )
+    state_value_displays: Dict[StateValueReference, StateValueDisplayType] = field(default_factory=dict)
+    global_state_value_displays: Dict[StateValueReference, StateValueDisplayType] = field(default_factory=dict)
     node_displays: Dict[Type[BaseNode], "NodeDisplayType"] = field(default_factory=dict)
     global_node_displays: Dict[Type[BaseNode], NodeDisplayType] = field(default_factory=dict)
     global_node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], "NodeOutputDisplay"]] = field(

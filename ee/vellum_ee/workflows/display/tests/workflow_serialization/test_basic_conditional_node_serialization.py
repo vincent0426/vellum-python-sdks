@@ -37,6 +37,7 @@ def test_serialize_workflow():
     assert serialized_workflow.keys() == {
         "workflow_raw_data",
         "input_variables",
+        "state_variables",
         "output_variables",
     }
 
@@ -785,6 +786,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
     assert serialized_workflow.keys() == {
         "workflow_raw_data",
         "input_variables",
+        "state_variables",
         "output_variables",
     }
 
@@ -890,6 +892,7 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
     assert serialized_workflow.keys() == {
         "workflow_raw_data",
         "input_variables",
+        "state_variables",
         "output_variables",
     }
 
@@ -982,6 +985,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
     assert serialized_workflow.keys() == {
         "workflow_raw_data",
         "input_variables",
+        "state_variables",
         "output_variables",
     }
 

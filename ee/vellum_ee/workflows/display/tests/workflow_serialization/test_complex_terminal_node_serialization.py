@@ -22,6 +22,7 @@ def test_serialize_workflow__missing_final_output_node():
     assert serialized_workflow.keys() == {
         "workflow_raw_data",
         "input_variables",
+        "state_variables",
         "output_variables",
     }
 

@@ -80,6 +80,26 @@ class _BaseWorkflowMeta(type):
         if "graph" not in dct:
             dct["graph"] = set()
 
+        if "Outputs" in dct:
+            outputs_class = dct["Outputs"]
+
+            if not any(issubclass(base, BaseOutputs) for base in outputs_class.__bases__):
+                parent_outputs_class = next(
+                    (base.Outputs for base in bases if hasattr(base, "Outputs")),
+                    BaseOutputs,  # Default to BaseOutputs only if no parent has Outputs
+                )
+
+                filtered_bases = tuple(base for base in outputs_class.__bases__ if base is not object)
+
+                new_dct = {key: value for key, value in outputs_class.__dict__.items() if not key.startswith("__")}
+                new_dct["__module__"] = dct["__module__"]
+
+                dct["Outputs"] = type(
+                    f"{name}.Outputs",
+                    (parent_outputs_class,) + filtered_bases,
+                    new_dct,
+                )
+
         cls = super().__new__(mcs, name, bases, dct)
         workflow_class = cast(Type["BaseWorkflow"], cls)
         workflow_class.__id__ = uuid4_from_hash(workflow_class.__qualname__)

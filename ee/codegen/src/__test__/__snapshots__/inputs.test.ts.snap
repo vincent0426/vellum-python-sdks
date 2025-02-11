@@ -11,6 +11,17 @@ class Inputs(BaseInputs):
 "
 `;
 
+exports[`Inputs > write > should generate correct Optional types when required is false 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+from typing import Optional, Union
+
+
+class Inputs(BaseInputs):
+    foo: Optional[str] = "Example String"
+    bar: Optional[Union[float, int]] = 123
+"
+`;
+
 exports[`Inputs > write > should generate correct code for complex input variables 1`] = `
 "from vellum.workflows.inputs import BaseInputs
 from typing import Union, List

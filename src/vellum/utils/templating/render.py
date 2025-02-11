@@ -1,3 +1,4 @@
+import ast
 import json
 from typing import Any, Callable, Dict, Optional, Union
 
@@ -8,8 +9,16 @@ from vellum.workflows.state.encoder import DefaultStateEncoder
 
 
 def finalize(obj: Any) -> str:
-    if isinstance(obj, dict):
+    if isinstance(obj, (dict, list)):
         return json.dumps(obj, cls=DefaultStateEncoder)
+
+    if isinstance(obj, str):
+        try:
+            data = ast.literal_eval(obj)
+            if isinstance(data, (dict, list)):
+                return json.dumps(data, cls=DefaultStateEncoder)
+        except (ValueError, SyntaxError):
+            pass
 
     return str(obj)
 
@@ -22,6 +31,12 @@ def render_sandboxed_jinja_template(
     jinja_globals: Optional[Dict[str, Any]] = None,
 ) -> str:
     """Render a Jinja template within a sandboxed environment."""
+    prepared_input_values = {}
+    for key, value in input_values.items():
+        if isinstance(value, list):
+            prepared_input_values[key] = json.loads(json.dumps(value, cls=DefaultStateEncoder))
+        else:
+            prepared_input_values[key] = value
 
     try:
         environment = SandboxedEnvironment(
@@ -40,7 +55,7 @@ def render_sandboxed_jinja_template(
         if jinja_globals:
             jinja_template.globals.update(jinja_globals)
 
-        rendered_template = jinja_template.render(input_values)
+        rendered_template = jinja_template.render(prepared_input_values)
     except json.JSONDecodeError as e:
         if e.msg == "Invalid control character at":
             raise JinjaTemplateError(

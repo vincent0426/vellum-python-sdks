@@ -101,13 +101,12 @@ def test_serialize_workflow():
         },
     }
 
-    final_output_nodes = workflow_raw_data["nodes"][2:4]  # Get the 2nd and 3rd nodes
-    # Determine which node is "input" and which is "state" based on ID
-    if final_output_nodes[0]["id"] == "27fdaa45-b8ce-464d-be50-cf71cc56bc10":
-        final_output_node_input, final_output_node_state = final_output_nodes
-    else:
-        final_output_node_state, final_output_node_input = final_output_nodes
-
+    final_output_node_state = next(
+        n for n in workflow_raw_data["nodes"] if n["type"] == "TERMINAL" and n["data"]["name"] == "example_state"
+    )
+    final_output_node_input = next(
+        n for n in workflow_raw_data["nodes"] if n["type"] == "TERMINAL" and n["data"]["name"] == "example_input"
+    )
     assert not DeepDiff(
         {
             "id": "27fdaa45-b8ce-464d-be50-cf71cc56bc10",
@@ -145,7 +144,7 @@ def test_serialize_workflow():
             },
             "definition": None,
         },
-        final_output_node_input,
+        final_output_node_state,
     )
 
     assert not DeepDiff(
@@ -185,7 +184,7 @@ def test_serialize_workflow():
             },
             "definition": None,
         },
-        final_output_node_state,
+        final_output_node_input,
     )
 
     # AND each edge should be serialized correctly

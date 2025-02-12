@@ -108,6 +108,7 @@ export class SubworkflowDeploymentNode extends BaseSingleFileNode<
                 id: output.id,
                 required: output.required,
               },
+              defaultRequired: true,
             })
           );
         }

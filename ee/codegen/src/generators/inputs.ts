@@ -83,6 +83,7 @@ export class Inputs extends BasePersistedFile {
           required: inputVariableData.required,
           default: inputVariableData.default,
         },
+        defaultRequired: false,
       });
 
       inputsClass.add(vellumVariableField);

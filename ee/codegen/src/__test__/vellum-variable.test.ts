@@ -98,4 +98,22 @@ describe("VellumVariableField", () => {
     nullVar.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
+
+  test("OptionalVellumVariable defaultRequired=true snapshot", async () => {
+    const optionalVar = codegen.vellumVariable({
+      variable: { id: "1", name: "test", type: "STRING" },
+      defaultRequired: true,
+    });
+    optionalVar.write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
+  test("OptionalVellumVariable defaultRequired=false snapshot", async () => {
+    const optionalVar = codegen.vellumVariable({
+      variable: { id: "1", name: "test", type: "STRING" },
+      defaultRequired: false,
+    });
+    optionalVar.write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
 });

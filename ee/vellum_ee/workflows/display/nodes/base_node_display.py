@@ -378,7 +378,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             state_value_display = display_context.global_state_value_displays[value]
             return {
                 "type": "STATE_VALUE",
-                "state_value_id": str(state_value_display.id),
+                "state_variable_id": str(state_value_display.id),
             }
 
         if isinstance(value, OutputReference):

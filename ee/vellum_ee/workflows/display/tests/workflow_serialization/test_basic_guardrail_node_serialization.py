@@ -16,7 +16,7 @@ def test_serialize_workflow():
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN we should get a serialized representation of the workflow
-    assert serialized_workflow.keys() == {"workflow_raw_data", "input_variables", "output_variables"}
+    assert serialized_workflow.keys() == {"workflow_raw_data", "input_variables", "state_variables", "output_variables"}
 
     # AND its input variables should be what we expect
     input_variables = serialized_workflow["input_variables"]

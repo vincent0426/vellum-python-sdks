@@ -25,6 +25,7 @@ def test_vellum_workflow_display__serialize_empty_workflow():
     # THEN it should return the expected config
     assert exec_config == {
         "input_variables": [],
+        "state_variables": [],
         "output_variables": [],
         "workflow_raw_data": {
             "definition": {

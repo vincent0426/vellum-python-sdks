@@ -32,6 +32,20 @@ WorkflowInputsDisplayOverridesType = TypeVar("WorkflowInputsDisplayOverridesType
 
 
 @dataclass
+class StateValueDisplayOverrides:
+    id: UUID
+
+
+@dataclass
+class StateValueDisplay(StateValueDisplayOverrides):
+    pass
+
+
+StateValueDisplayType = TypeVar("StateValueDisplayType", bound=StateValueDisplay)
+StateValueDisplayOverridesType = TypeVar("StateValueDisplayOverridesType", bound=StateValueDisplayOverrides)
+
+
+@dataclass
 class EdgeDisplayOverrides:
     id: UUID
 

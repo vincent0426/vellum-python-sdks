@@ -14,6 +14,8 @@ from vellum_ee.workflows.display.base import (
     EdgeDisplayOverrides,
     EntrypointDisplay,
     EntrypointDisplayOverrides,
+    StateValueDisplay,
+    StateValueDisplayOverrides,
     WorkflowInputsDisplay,
     WorkflowInputsDisplayOverrides,
     WorkflowMetaDisplay,
@@ -81,6 +83,18 @@ class WorkflowInputsVellumDisplayOverrides(WorkflowInputsDisplay, WorkflowInputs
 
 @dataclass
 class WorkflowInputsVellumDisplay(WorkflowInputsVellumDisplayOverrides):
+    pass
+
+
+@dataclass
+class StateValueVellumDisplayOverrides(StateValueDisplay, StateValueDisplayOverrides):
+    name: Optional[str] = None
+    required: Optional[bool] = None
+    color: Optional[str] = None
+
+
+@dataclass
+class StateValueVellumDisplay(StateValueVellumDisplayOverrides):
     pass
 
 

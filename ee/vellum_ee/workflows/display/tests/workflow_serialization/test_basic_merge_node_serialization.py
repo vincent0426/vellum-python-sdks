@@ -18,6 +18,7 @@ def test_serialize_workflow__await_all():
     assert serialized_workflow.keys() == {
         "workflow_raw_data",
         "input_variables",
+        "state_variables",
         "output_variables",
     }
 

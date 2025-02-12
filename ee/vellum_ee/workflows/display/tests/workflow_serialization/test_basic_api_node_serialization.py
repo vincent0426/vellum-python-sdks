@@ -32,6 +32,7 @@ def test_serialize_workflow(vellum_client):
     assert serialized_workflow.keys() == {
         "workflow_raw_data",
         "input_variables",
+        "state_variables",
         "output_variables",
     }
 

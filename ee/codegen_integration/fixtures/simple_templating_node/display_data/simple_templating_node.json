@@ -178,6 +178,7 @@
     }
   },
   "input_variables": [],
+  "state_variables": [],
   "output_variables": [
     {
       "id": "b0961a8d-f702-4922-b410-2aecf7d34b68",

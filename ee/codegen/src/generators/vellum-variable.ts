@@ -18,23 +18,37 @@ type VellumVariableWithName = (
     default?: VellumValueType | null;
   };
 
+// VellumVariable.defaultRequired:
+// Prompt Inputs: required: undefined == required: true,
+// Workflow Inputs: required: undefined == required: false
+// Workflow Outputs: required: undefined == required: true
 export declare namespace VellumVariable {
   interface Args {
     variable: VellumVariableWithName;
+    defaultRequired?: boolean;
   }
 }
 
 export class VellumVariable extends AstNode {
   private readonly field: python.Field;
 
-  constructor({ variable }: VellumVariable.Args) {
+  constructor({ variable, defaultRequired }: VellumVariable.Args) {
     super();
 
     const baseType = getVellumVariablePrimitiveType(variable.type);
-    const finalType =
-      !variable.required && variable.type != "NULL"
-        ? Type.optional(baseType)
-        : baseType;
+    let finalType = baseType;
+
+    // NULL type do not need to be optional
+    // variable.required === false is used to indicate that the variable is optional
+    // if required not defined, we use defaultRequired to determine if the variable is optional
+    // See VellumVariable.defaultRequired for more information
+    if (
+      variable.type !== "NULL" &&
+      (variable.required === false ||
+        (variable.required === undefined && defaultRequired === false))
+    ) {
+      finalType = Type.optional(baseType);
+    }
 
     this.field = python.field({
       name: variable.name ?? variable.key,

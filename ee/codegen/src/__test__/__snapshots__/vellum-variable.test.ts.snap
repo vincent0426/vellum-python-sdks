@@ -40,6 +40,16 @@ exports[`VellumVariableField > NumberVellumVariable snapshot 1`] = `
 "
 `;
 
+exports[`VellumVariableField > OptionalVellumVariable defaultRequired=false snapshot 1`] = `
+"test: Optional[str]
+"
+`;
+
+exports[`VellumVariableField > OptionalVellumVariable defaultRequired=true snapshot 1`] = `
+"test: str
+"
+`;
+
 exports[`VellumVariableField > SearchResultsVellumVariable snapshot 1`] = `
 "test: List[SearchResult]
 "

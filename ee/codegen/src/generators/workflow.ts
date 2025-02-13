@@ -25,7 +25,6 @@ import { Inputs } from "src/generators/inputs";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { WorkflowOutput } from "src/generators/workflow-output";
 import {
-  NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
   WorkflowDisplayData,
   WorkflowEdge,
@@ -473,7 +472,6 @@ export class Workflow {
               let outputId: string;
               let name: string;
               let label: string;
-              let displayData: NodeDisplayDataType | undefined;
 
               // Final output node
               if ("type" in finalOutput) {
@@ -481,7 +479,6 @@ export class Workflow {
                 outputId = finalOutput.data.outputId;
                 name = finalOutput.data.name;
                 label = finalOutput.data.label;
-                displayData = finalOutput.displayData;
               } else {
                 const nodeId =
                   getNodeIdFromNodeOutputWorkflowReference(finalOutput);
@@ -502,7 +499,6 @@ export class Workflow {
                   getNodeOutputIdFromNodeOutputWorkflowReference(finalOutput);
                 name = referencedOutput.name;
                 label = this.getLabel(referencedNode.nodeData);
-                displayData = referencedNode.nodeData.displayData;
               }
 
               return {
@@ -538,13 +534,6 @@ export class Workflow {
                     python.methodArgument({
                       name: "label",
                       value: python.TypeInstantiation.str(label),
-                    }),
-                    python.methodArgument({
-                      name: "display_data",
-                      value: new NodeDisplayData({
-                        nodeDisplayData: displayData,
-                        workflowContext: this.workflowContext,
-                      }),
                     }),
                   ],
                 }),

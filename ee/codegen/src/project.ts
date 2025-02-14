@@ -522,6 +522,20 @@ ${errors.slice(0, 3).map((err) => {
       });
     }
 
+    // Include at the end nodes that are included in the workflow, but not referenced in the graph
+    // For example, Note Nodes.
+    const unprocessedNodes: WorkflowDataNode[] = rawData.nodes.filter(
+      (node): node is WorkflowDataNode => {
+        return (
+          !processedNodeIds.has(node.id) &&
+          node.type !== "ENTRYPOINT" &&
+          node.type !== "TERMINAL"
+        );
+      }
+    );
+
+    orderedNodes.push(...unprocessedNodes);
+
     return orderedNodes;
   }
 

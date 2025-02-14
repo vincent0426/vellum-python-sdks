@@ -5,6 +5,7 @@ import { isNil } from "lodash";
 import { vellumValue } from "src/codegen";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { WorkflowSandboxInputs } from "src/types/vellum";
+import { removeEscapeCharacters } from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
 
 export declare namespace WorkflowSandboxFile {
@@ -83,8 +84,9 @@ if __name__ != "__main__":
       arguments_: inputs
         .filter((input) => !isNil(input.value))
         .map((input) => {
+          const rawName = removeEscapeCharacters(input.name);
           const inputVariableContext =
-            this.workflowContext.getInputVariableContextByRawName(input.name);
+            this.workflowContext.getInputVariableContextByRawName(rawName);
 
           return python.methodArgument({
             name: inputVariableContext.name,

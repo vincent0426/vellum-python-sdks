@@ -1,3 +1,5 @@
+import { OutputVariableContext } from "./output-variable-context";
+
 import { WorkflowContext } from "src/context/workflow-context";
 import { WorkflowOutputGenerationError } from "src/generators/errors";
 import {
@@ -18,7 +20,6 @@ export class WorkflowOutputContext {
   private readonly workflowContext: WorkflowContext;
   private readonly terminalNodeData?: FinalOutputNodeType;
   private readonly workflowOutputValue?: WorkflowOutputValueType;
-  public readonly name: string;
 
   constructor({
     workflowContext,
@@ -28,16 +29,13 @@ export class WorkflowOutputContext {
     this.workflowContext = workflowContext;
     this.terminalNodeData = terminalNodeData;
     this.workflowOutputValue = workflowOutputValue;
-    this.name = this.getOutputVariableName();
   }
 
-  public getFinalOutputNodeData():
-    | FinalOutputNodeType
-    | WorkflowOutputValueType {
+  private getOutputVariableId(): string {
     if (this.workflowOutputValue) {
-      return this.workflowOutputValue;
+      return this.workflowOutputValue.outputVariableId;
     } else if (this.terminalNodeData) {
-      return this.terminalNodeData;
+      return this.terminalNodeData.data.outputId;
     } else {
       throw new WorkflowOutputGenerationError(
         "Expected either workflow output value or terminal node data to be defined"
@@ -61,21 +59,8 @@ export class WorkflowOutputContext {
     }
   }
 
-  private getOutputVariableName(): string {
-    if (this.terminalNodeData) {
-      const outputVariable = this.workflowContext.getOutputVariableContextById(
-        this.terminalNodeData.data.outputId
-      );
-      return outputVariable.name;
-    } else if (this.workflowOutputValue) {
-      const outputVariable = this.workflowContext.getOutputVariableContextById(
-        this.workflowOutputValue.outputVariableId
-      );
-      return outputVariable.name;
-    } else {
-      throw new WorkflowOutputGenerationError(
-        "Expected either workflow output value or terminal node data to be defined"
-      );
-    }
+  public getOutputVariable(): OutputVariableContext {
+    const outputVariableId = this.getOutputVariableId();
+    return this.workflowContext.getOutputVariableContextById(outputVariableId);
   }
 }

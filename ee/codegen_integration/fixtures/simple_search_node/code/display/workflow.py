@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from vellum_ee.workflows.display.base import WorkflowOutputDisplay
 from vellum_ee.workflows.display.vellum import (
     EdgeVellumDisplayOverrides,
     EntrypointVellumDisplayOverrides,
@@ -9,7 +10,6 @@ from vellum_ee.workflows.display.vellum import (
     WorkflowDisplayDataViewport,
     WorkflowInputsVellumDisplayOverrides,
     WorkflowMetaVellumDisplayOverrides,
-    WorkflowOutputVellumDisplayOverrides,
 )
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
 
@@ -48,7 +48,7 @@ class WorkflowDisplay(VellumWorkflowDisplay[Workflow]):
         )
     }
     output_displays = {
-        Workflow.Outputs.final_output: WorkflowOutputVellumDisplayOverrides(
+        Workflow.Outputs.final_output: WorkflowOutputDisplay(
             id=UUID("43e128f4-24fe-4484-9d08-948a4a390707"), name="final-output"
         )
     }

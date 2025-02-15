@@ -1,3 +1,5 @@
+import pytest
+
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
@@ -78,3 +80,89 @@ def test_subworkflow__inherit_base_outputs():
     # TEST that the outputs are correct
     assert terminal_event.name == "workflow.execution.fulfilled", terminal_event
     assert terminal_event.outputs == {"output": "bar"}
+
+
+def test_workflow__nodes_not_in_graph():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class NodeC(BaseNode):
+        pass
+
+    # WHEN we create a workflow with multiple unused nodes
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = NodeA
+        unused_graphs = {NodeB, NodeC}
+
+    # TEST that all nodes from unused_graphs are collected
+    unused_graphs = set(TestWorkflow.get_unused_nodes())
+    assert unused_graphs == {NodeB, NodeC}
+
+
+def test_workflow__unused_graphs():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class NodeC(BaseNode):
+        pass
+
+    class NodeD(BaseNode):
+        pass
+
+    class NodeE(BaseNode):
+        pass
+
+    class NodeF(BaseNode):
+        pass
+
+    # WHEN we create a workflow with unused nodes in a graph
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = NodeA
+        unused_graphs = {NodeB >> {NodeC >> NodeD}, NodeE, NodeF}
+
+    # TEST that all nodes from unused_graphs are collected
+    unused_graphs = set(TestWorkflow.get_unused_nodes())
+    assert unused_graphs == {NodeB, NodeC, NodeD, NodeE, NodeF}
+
+
+def test_workflow__no_unused_nodes():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    # WHEN we create a workflow with no unused nodes
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = NodeA >> NodeB
+
+    # TEST that nodes not in the graph are empty
+    nodes = set(TestWorkflow.get_unused_nodes())
+    assert nodes == set()
+
+
+def test_workflow__node_in_both_graph_and_unused():
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class NodeC(BaseNode):
+        pass
+
+    # WHEN we try to create a workflow where NodeA appears in both graph and unused
+    with pytest.raises(ValueError) as exc_info:
+
+        class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+            graph = NodeA >> NodeB
+            unused_graphs = {NodeA >> NodeC}
+
+    # THEN it should raise an error
+    assert "Node(s) NodeA cannot appear in both graph and unused_graphs" in str(exc_info.value)

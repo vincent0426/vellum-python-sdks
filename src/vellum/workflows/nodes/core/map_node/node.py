@@ -42,8 +42,8 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
     Used to map over a list of items and execute a Subworkflow on each iteration.
 
     items: List[MapNodeItemType] - The items to map over
-    subworkflow: Type["BaseWorkflow[SubworkflowInputs, BaseState]"] - The Subworkflow to execute on each iteration
     max_concurrency: Optional[int] = None - The maximum number of concurrent subworkflow executions
+    subworkflow: Type["BaseWorkflow"] - The Subworkflow to execute
     """
 
     items: List[MapNodeItemType]

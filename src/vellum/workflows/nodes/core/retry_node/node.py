@@ -18,9 +18,10 @@ class RetryNode(BaseAdornmentNode[StateType], Generic[StateType]):
     Used to retry a Subworkflow a specified number of times.
 
     max_attempts: int - The maximum number of attempts to retry the Subworkflow
-    delay: float - The number of seconds to wait between retries
-    retry_on_error_code: Optional[VellumErrorCode] = None - The error code to retry on
-    subworkflow: Type["BaseWorkflow[SubworkflowInputs, BaseState]"] - The Subworkflow to execute
+    delay: float = None - The number of seconds to wait between retries
+    retry_on_error_code: Optional[WorkflowErrorCode] = None - The error code to retry on
+    retry_on_condition: Optional[BaseDescriptor] = None - The condition to retry on
+    subworkflow: Type["BaseWorkflow"] - The Subworkflow to execute
     """
 
     max_attempts: int

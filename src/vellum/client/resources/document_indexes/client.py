@@ -54,8 +54,8 @@ class DocumentIndexesClient:
         status : typing.Optional[DocumentIndexesListRequestStatus]
             Filter down to only document indices that have a status matching the status specified
 
-            - `ACTIVE` - Active
-            - `ARCHIVED` - Archived
+            * `ACTIVE` - Active
+            * `ARCHIVED` - Archived
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -589,8 +589,8 @@ class AsyncDocumentIndexesClient:
         status : typing.Optional[DocumentIndexesListRequestStatus]
             Filter down to only document indices that have a status matching the status specified
 
-            - `ACTIVE` - Active
-            - `ARCHIVED` - Archived
+            * `ACTIVE` - Active
+            * `ARCHIVED` - Archived
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.

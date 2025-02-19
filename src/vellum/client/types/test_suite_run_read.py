@@ -21,11 +21,11 @@ class TestSuiteRunRead(UniversalBaseModel):
     """
     The current state of this run
     
-    - `QUEUED` - Queued
-    - `RUNNING` - Running
-    - `COMPLETE` - Complete
-    - `FAILED` - Failed
-    - `CANCELLED` - Cancelled
+    * `QUEUED` - Queued
+    * `RUNNING` - Running
+    * `COMPLETE` - Complete
+    * `FAILED` - Failed
+    * `CANCELLED` - Cancelled
     """
 
     exec_config: typing.Optional[TestSuiteRunExecConfig] = pydantic.Field(default=None)

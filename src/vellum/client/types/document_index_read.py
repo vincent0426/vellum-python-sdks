@@ -27,17 +27,17 @@ class DocumentIndexRead(UniversalBaseModel):
     """
     The current status of the document index
     
-    - `ACTIVE` - Active
-    - `ARCHIVED` - Archived
+    * `ACTIVE` - Active
+    * `ARCHIVED` - Archived
     """
 
     environment: typing.Optional[EnvironmentEnum] = pydantic.Field(default=None)
     """
     The environment this document index is used in
     
-    - `DEVELOPMENT` - Development
-    - `STAGING` - Staging
-    - `PRODUCTION` - Production
+    * `DEVELOPMENT` - Development
+    * `STAGING` - Staging
+    * `PRODUCTION` - Production
     """
 
     indexing_config: DocumentIndexIndexingConfig

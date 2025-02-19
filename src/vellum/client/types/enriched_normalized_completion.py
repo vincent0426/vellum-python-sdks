@@ -29,9 +29,9 @@ class EnrichedNormalizedCompletion(UniversalBaseModel):
     """
     The reason the generation finished.
     
-    - `LENGTH` - LENGTH
-    - `STOP` - STOP
-    - `UNKNOWN` - UNKNOWN
+    * `LENGTH` - LENGTH
+    * `STOP` - STOP
+    * `UNKNOWN` - UNKNOWN
     """
 
     logprobs: typing.Optional[NormalizedLogProbs] = pydantic.Field(default=None)

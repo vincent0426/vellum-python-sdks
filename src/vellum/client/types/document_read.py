@@ -28,7 +28,7 @@ class DocumentRead(UniversalBaseModel):
     """
     The current status of the document
     
-    - `ACTIVE` - Active
+    * `ACTIVE` - Active
     """
 
     original_file_url: typing.Optional[str] = None

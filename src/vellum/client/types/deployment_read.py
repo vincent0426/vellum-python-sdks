@@ -30,17 +30,17 @@ class DeploymentRead(UniversalBaseModel):
     """
     The current status of the deployment
     
-    - `ACTIVE` - Active
-    - `ARCHIVED` - Archived
+    * `ACTIVE` - Active
+    * `ARCHIVED` - Archived
     """
 
     environment: typing.Optional[EnvironmentEnum] = pydantic.Field(default=None)
     """
     The environment this deployment is used in
     
-    - `DEVELOPMENT` - Development
-    - `STAGING` - Staging
-    - `PRODUCTION` - Production
+    * `DEVELOPMENT` - Development
+    * `STAGING` - Staging
+    * `PRODUCTION` - Production
     """
 
     last_deployed_on: dt.datetime

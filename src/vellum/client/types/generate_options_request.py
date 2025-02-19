@@ -12,8 +12,8 @@ class GenerateOptionsRequest(UniversalBaseModel):
     """
     Which logprobs to include, if any. Defaults to NONE.
     
-    - `ALL` - ALL
-    - `NONE` - NONE
+    * `ALL` - ALL
+    * `NONE` - NONE
     """
 
     if IS_PYDANTIC_V2:

@@ -278,7 +278,6 @@ class DocumentsClient:
         **Note:** Uses a base url of `https://documents.vellum.ai`.
 
         This is a multipart/form-data request. The `contents` field should be a file upload. It also expects a JSON body with the following fields:
-
         - `add_to_index_names: list[str]` - Optionally include the names of all indexes that you'd like this document to be included in
         - `external_id: str | None` - Optionally include an external ID for this document. This is useful if you want to re-upload the same document later when its contents change and would like it to be re-indexed.
         - `label: str` - A human-friendly name for this document. Typically the filename.
@@ -675,7 +674,6 @@ class AsyncDocumentsClient:
         **Note:** Uses a base url of `https://documents.vellum.ai`.
 
         This is a multipart/form-data request. The `contents` field should be a file upload. It also expects a JSON body with the following fields:
-
         - `add_to_index_names: list[str]` - Optionally include the names of all indexes that you'd like this document to be included in
         - `external_id: str | None` - Optionally include an external ID for this document. This is useful if you want to re-upload the same document later when its contents change and would like it to be re-indexed.
         - `label: str` - A human-friendly name for this document. Typically the filename.

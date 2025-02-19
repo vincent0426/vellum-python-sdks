@@ -39,7 +39,6 @@ class FolderEntitiesClient:
 
             To filter by an entity's parent folder, provide the ID of the parent folder. To filter by the root directory, provide
             a string representing the entity type of the root directory. Supported root directories include:
-
             - PROMPT_SANDBOX
             - WORKFLOW_SANDBOX
             - DOCUMENT_INDEX
@@ -48,8 +47,8 @@ class FolderEntitiesClient:
         entity_status : typing.Optional[FolderEntitiesListRequestEntityStatus]
             Filter down to only those objects whose entities have a status matching the status specified.
 
-            - `ACTIVE` - Active
-            - `ARCHIVED` - Archived
+            * `ACTIVE` - Active
+            * `ARCHIVED` - Archived
 
         limit : typing.Optional[int]
             Number of results to return per page.
@@ -119,7 +118,6 @@ class FolderEntitiesClient:
         folder_id : str
             The ID of the folder to which the entity should be added. This can be a UUID of a folder, or the name of a root
             directory. Supported root directories include:
-
             - PROMPT_SANDBOX
             - WORKFLOW_SANDBOX
             - DOCUMENT_INDEX
@@ -190,7 +188,6 @@ class AsyncFolderEntitiesClient:
 
             To filter by an entity's parent folder, provide the ID of the parent folder. To filter by the root directory, provide
             a string representing the entity type of the root directory. Supported root directories include:
-
             - PROMPT_SANDBOX
             - WORKFLOW_SANDBOX
             - DOCUMENT_INDEX
@@ -199,8 +196,8 @@ class AsyncFolderEntitiesClient:
         entity_status : typing.Optional[FolderEntitiesListRequestEntityStatus]
             Filter down to only those objects whose entities have a status matching the status specified.
 
-            - `ACTIVE` - Active
-            - `ARCHIVED` - Archived
+            * `ACTIVE` - Active
+            * `ARCHIVED` - Archived
 
         limit : typing.Optional[int]
             Number of results to return per page.
@@ -278,7 +275,6 @@ class AsyncFolderEntitiesClient:
         folder_id : str
             The ID of the folder to which the entity should be added. This can be a UUID of a folder, or the name of a root
             directory. Supported root directories include:
-
             - PROMPT_SANDBOX
             - WORKFLOW_SANDBOX
             - DOCUMENT_INDEX

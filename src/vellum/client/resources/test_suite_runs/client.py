@@ -163,7 +163,6 @@ class TestSuiteRunsClient:
 
         expand : typing.Optional[typing.Union[str, typing.Sequence[str]]]
             The response fields to expand for more information.
-
             - 'results.metric_results.metric_label' expands the metric label for each metric result.
             - 'results.metric_results.metric_definition' expands the metric definition for each metric result.
             - 'results.metric_results.metric_definition.name' expands the metric definition name for each metric result.
@@ -381,7 +380,6 @@ class AsyncTestSuiteRunsClient:
 
         expand : typing.Optional[typing.Union[str, typing.Sequence[str]]]
             The response fields to expand for more information.
-
             - 'results.metric_results.metric_label' expands the metric label for each metric result.
             - 'results.metric_results.metric_definition' expands the metric definition for each metric result.
             - 'results.metric_results.metric_definition.name' expands the metric definition name for each metric result.

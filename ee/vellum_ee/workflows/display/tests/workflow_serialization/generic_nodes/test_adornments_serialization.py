@@ -1,3 +1,4 @@
+import pytest
 from uuid import uuid4
 
 from deepdiff import DeepDiff
@@ -11,6 +12,7 @@ from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.base_node_vellum_display import BaseNodeVellumDisplay
+from vellum_ee.workflows.display.nodes.vellum.retry_node import BaseRetryNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.try_node import BaseTryNodeDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 from vellum_ee.workflows.display.workflows.vellum_workflow_display import VellumWorkflowDisplay
@@ -32,7 +34,7 @@ class InnerRetryGenericNodeDisplay(BaseNodeDisplay[InnerRetryGenericNode.__wrapp
     pass
 
 
-class OuterRetryNodeDisplay(BaseNodeDisplay[InnerRetryGenericNode]):
+class OuterRetryNodeDisplay(BaseRetryNodeDisplay[InnerRetryGenericNode]):  # type: ignore
     pass
 
 
@@ -213,3 +215,25 @@ def test_serialize_node__try(serialize_node):
         },
         serialized_node,
     )
+
+
+@pytest.mark.skip(reason="Not implemented")
+def test_serialize_node__stacked():
+    @TryNode.wrap()
+    @RetryNode.wrap(max_attempts=5)
+    class InnerStackedGenericNode(BaseNode):
+        pass
+
+    # AND a workflow that uses the adornment node
+    class StackedWorkflow(BaseWorkflow):
+        graph = InnerStackedGenericNode
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(
+        base_display_class=VellumWorkflowDisplay,
+        workflow_class=StackedWorkflow,
+    )
+    exec_config = workflow_display.serialize()
+
+    # THEN the workflow display is created successfully
+    assert exec_config is not None

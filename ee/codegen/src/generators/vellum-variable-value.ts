@@ -19,7 +19,7 @@ import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { Json } from "src/generators/json";
 import { IterableConfig } from "src/types/vellum";
 import { removeEscapeCharacters } from "src/utils/casing";
-import { assertUnreachable, isNilOrEmpty } from "src/utils/typing";
+import { assertUnreachable } from "src/utils/typing";
 
 class StringVellumValue extends AstNode {
   private astNode: AstNode;
@@ -92,7 +92,7 @@ class ChatHistoryVellumValue extends AstNode {
     value: ChatMessageRequest[],
     isRequestType: boolean
   ): AstNode | undefined {
-    if (isNilOrEmpty(value)) {
+    if (isNil(value)) {
       return undefined;
     }
     const chatMessages = value.map((chatMessage) => {
@@ -509,7 +509,6 @@ export class VellumValue extends AstNode {
       python.TypeInstantiation.none().write(writer);
       return;
     }
-
     this.astNode.write(writer);
   }
 }

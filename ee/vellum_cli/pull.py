@@ -108,6 +108,7 @@ def pull_command(
     exclude_code: Optional[bool] = None,
     strict: Optional[bool] = None,
     include_sandbox: Optional[bool] = None,
+    target_directory: Optional[str] = None,
 ) -> None:
     load_dotenv()
     logger = load_cli_logger()
@@ -129,7 +130,7 @@ def pull_command(
         raise ValueError("No workflow sandbox ID found in project to pull from.")
 
     if workflow_config.module:
-        logger.info(f"Pulling workflow into {workflow_config.module}...")
+        logger.info(f"Pulling workflow {workflow_config.module}...")
     else:
         logger.info(f"Pulling workflow from {pk}...")
 
@@ -175,7 +176,9 @@ def pull_command(
         if not workflow_config.module:
             raise ValueError(f"Failed to resolve a module name for Workflow {pk}")
 
-        target_dir = os.path.join(os.getcwd(), *workflow_config.module.split("."))
+        # Use target_directory if provided, otherwise use current working directory
+        base_dir = os.path.join(os.getcwd(), target_directory) if target_directory else os.getcwd()
+        target_dir = os.path.join(base_dir, *workflow_config.module.split("."))
 
         # Delete files in target_dir that aren't in the zip file
         if os.path.exists(target_dir):
@@ -233,4 +236,4 @@ Its schema should be considered unstable and subject to change at any time."""
     if error_content:
         logger.error(error_content)
     else:
-        logger.info(f"Successfully pulled Workflow into {workflow_config.module}")
+        logger.info(f"Successfully pulled Workflow into {target_dir}")

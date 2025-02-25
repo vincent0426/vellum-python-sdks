@@ -6,6 +6,7 @@ from .function_call_chat_message_content import FunctionCallChatMessageContent
 from .array_chat_message_content import ArrayChatMessageContent
 from .image_chat_message_content import ImageChatMessageContent
 from .audio_chat_message_content import AudioChatMessageContent
+from .document_chat_message_content import DocumentChatMessageContent
 
 ChatMessageContent = typing.Union[
     StringChatMessageContent,
@@ -13,4 +14,5 @@ ChatMessageContent = typing.Union[
     ArrayChatMessageContent,
     ImageChatMessageContent,
     AudioChatMessageContent,
+    DocumentChatMessageContent,
 ]

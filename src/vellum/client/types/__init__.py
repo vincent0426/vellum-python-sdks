@@ -78,6 +78,8 @@ from .deployment_read import DeploymentRead
 from .deployment_release_tag_deployment_history_item import DeploymentReleaseTagDeploymentHistoryItem
 from .deployment_release_tag_read import DeploymentReleaseTagRead
 from .docker_service_token import DockerServiceToken
+from .document_chat_message_content import DocumentChatMessageContent
+from .document_chat_message_content_request import DocumentChatMessageContentRequest
 from .document_document_to_document_index import DocumentDocumentToDocumentIndex
 from .document_index_chunking import DocumentIndexChunking
 from .document_index_chunking_request import DocumentIndexChunkingRequest
@@ -87,6 +89,8 @@ from .document_index_read import DocumentIndexRead
 from .document_processing_state import DocumentProcessingState
 from .document_read import DocumentRead
 from .document_status import DocumentStatus
+from .document_vellum_value import DocumentVellumValue
+from .document_vellum_value_request import DocumentVellumValueRequest
 from .enriched_normalized_completion import EnrichedNormalizedCompletion
 from .entity_status import EntityStatus
 from .entity_visibility import EntityVisibility
@@ -462,6 +466,8 @@ from .upsert_test_suite_test_case_request import UpsertTestSuiteTestCaseRequest
 from .variable_prompt_block import VariablePromptBlock
 from .vellum_audio import VellumAudio
 from .vellum_audio_request import VellumAudioRequest
+from .vellum_document import VellumDocument
+from .vellum_document_request import VellumDocumentRequest
 from .vellum_error import VellumError
 from .vellum_error_code_enum import VellumErrorCodeEnum
 from .vellum_error_request import VellumErrorRequest
@@ -596,6 +602,8 @@ __all__ = [
     "DeploymentReleaseTagDeploymentHistoryItem",
     "DeploymentReleaseTagRead",
     "DockerServiceToken",
+    "DocumentChatMessageContent",
+    "DocumentChatMessageContentRequest",
     "DocumentDocumentToDocumentIndex",
     "DocumentIndexChunking",
     "DocumentIndexChunkingRequest",
@@ -605,6 +613,8 @@ __all__ = [
     "DocumentProcessingState",
     "DocumentRead",
     "DocumentStatus",
+    "DocumentVellumValue",
+    "DocumentVellumValueRequest",
     "EnrichedNormalizedCompletion",
     "EntityStatus",
     "EntityVisibility",
@@ -960,6 +970,8 @@ __all__ = [
     "VariablePromptBlock",
     "VellumAudio",
     "VellumAudioRequest",
+    "VellumDocument",
+    "VellumDocumentRequest",
     "VellumError",
     "VellumErrorCodeEnum",
     "VellumErrorRequest",

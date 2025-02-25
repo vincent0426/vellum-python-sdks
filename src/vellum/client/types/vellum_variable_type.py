@@ -14,6 +14,7 @@ VellumVariableType = typing.Union[
         "FUNCTION_CALL",
         "IMAGE",
         "AUDIO",
+        "DOCUMENT",
         "NULL",
     ],
     typing.Any,

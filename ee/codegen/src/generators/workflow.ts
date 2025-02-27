@@ -44,10 +44,12 @@ export class Workflow {
   public readonly workflowContext: WorkflowContext;
   private readonly inputs: Inputs;
   private readonly displayData: WorkflowDisplayData | undefined;
+  private readonly unusedEdges: Set<WorkflowEdge>;
   constructor({ workflowContext, inputs, displayData }: Workflow.Args) {
     this.workflowContext = workflowContext;
     this.inputs = inputs;
     this.displayData = displayData;
+    this.unusedEdges = new Set();
   }
 
   private generateParentWorkflowClass(): python.Reference {
@@ -121,6 +123,7 @@ export class Workflow {
     workflowClass.inheritReferences(baseWorkflowClassRef);
 
     this.addGraph(workflowClass);
+    this.addUnusedGraphs(workflowClass);
 
     if (this.workflowContext.workflowOutputContexts.length > 0) {
       const outputsClass = this.generateOutputsClass(baseWorkflowClassRef);
@@ -500,14 +503,25 @@ export class Workflow {
     }
 
     try {
+      const graph = new GraphAttribute({
+        workflowContext: this.workflowContext,
+      });
+
       const graphField = python.field({
         name: "graph",
-        initializer: new GraphAttribute({
-          workflowContext: this.workflowContext,
-        }),
+        initializer: graph,
       });
 
       workflowClass.add(graphField);
+
+      // update the graph with the unused edges
+      const usedEdges = graph.getUsedEdges();
+      const allEdges = this.getEdges();
+      allEdges.forEach((edge) => {
+        if (!usedEdges.has(edge)) {
+          this.unusedEdges.add(edge);
+        }
+      });
     } catch (error) {
       if (error instanceof BaseCodegenError) {
         this.workflowContext.addError(error);
@@ -516,6 +530,54 @@ export class Workflow {
 
       throw error;
     }
+  }
+
+  private addUnusedGraphs(workflowClass: python.Class): void {
+    // Filter out edges that reference non-existent nodes
+    const validUnusedEdges = new Set<WorkflowEdge>();
+
+    this.unusedEdges.forEach((edge) => {
+      try {
+        this.workflowContext.getNodeContext(edge.sourceNodeId);
+        this.workflowContext.getNodeContext(edge.targetNodeId);
+        validUnusedEdges.add(edge);
+      } catch (e) {
+        if (e instanceof NodeNotFoundError) {
+          console.warn(e.message);
+        } else {
+          throw e;
+        }
+      }
+    });
+
+    if (validUnusedEdges.size === 0) {
+      return;
+    }
+
+    let remainingEdges = validUnusedEdges;
+
+    // set of unused graphs
+    const unusedGraphs: GraphAttribute[] = [];
+    while (remainingEdges.size > 0) {
+      const unusedGraph = new GraphAttribute({
+        workflowContext: this.workflowContext,
+        unusedEdges: remainingEdges,
+      });
+
+      const processedEdges = unusedGraph.getUsedEdges();
+      remainingEdges = new Set(
+        [...remainingEdges].filter((edge) => !processedEdges.has(edge))
+      );
+
+      unusedGraphs.push(unusedGraph);
+    }
+
+    const unusedGraphsField = python.field({
+      name: "unused_graphs",
+      initializer: python.TypeInstantiation.set(unusedGraphs),
+    });
+
+    workflowClass.add(unusedGraphsField);
   }
 
   public getWorkflowFile(): WorkflowFile {

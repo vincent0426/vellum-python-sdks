@@ -8,6 +8,7 @@ from .rich_text_prompt_block import RichTextPromptBlock
 from .audio_prompt_block import AudioPromptBlock
 from .function_call_prompt_block import FunctionCallPromptBlock
 from .image_prompt_block import ImagePromptBlock
+from .document_prompt_block import DocumentPromptBlock
 import typing
 
 if typing.TYPE_CHECKING:
@@ -20,4 +21,5 @@ PromptBlock = typing.Union[
     AudioPromptBlock,
     FunctionCallPromptBlock,
     ImagePromptBlock,
+    DocumentPromptBlock,
 ]

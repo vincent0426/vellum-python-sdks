@@ -87,6 +87,7 @@ from .document_index_indexing_config import DocumentIndexIndexingConfig
 from .document_index_indexing_config_request import DocumentIndexIndexingConfigRequest
 from .document_index_read import DocumentIndexRead
 from .document_processing_state import DocumentProcessingState
+from .document_prompt_block import DocumentPromptBlock
 from .document_read import DocumentRead
 from .document_status import DocumentStatus
 from .document_vellum_value import DocumentVellumValue
@@ -611,6 +612,7 @@ __all__ = [
     "DocumentIndexIndexingConfigRequest",
     "DocumentIndexRead",
     "DocumentProcessingState",
+    "DocumentPromptBlock",
     "DocumentRead",
     "DocumentStatus",
     "DocumentVellumValue",

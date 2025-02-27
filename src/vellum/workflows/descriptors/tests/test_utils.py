@@ -96,6 +96,13 @@ class DummyNode(BaseNode[FixtureState]):
             ).does_not_contain("test"),
             False,
         ),
+        (ConstantValueReference('{"foo": "bar"}').parse_json(), {"foo": "bar"}),
+        (ConstantValueReference('{"foo": "bar"}').parse_json()["foo"], "bar"),
+        (ConstantValueReference("[1, 2, 3]").parse_json(), [1, 2, 3]),
+        (ConstantValueReference("[1, 2, 3]").parse_json()[0], 1),
+        (ConstantValueReference(b'{"foo": "bar"}').parse_json(), {"foo": "bar"}),
+        (ConstantValueReference(bytearray(b'{"foo": "bar"}')).parse_json(), {"foo": "bar"}),
+        (ConstantValueReference(b'{"key": "\xf0\x9f\x8c\x9f"}').parse_json(), {"key": "🌟"}),
     ],
     ids=[
         "or",
@@ -143,6 +150,13 @@ class DummyNode(BaseNode[FixtureState]):
         "list_index",
         "error_contains",
         "error_does_not_contain",
+        "parse_json_constant",
+        "parse_json_accessor",
+        "parse_json_list",
+        "parse_json_list_index",
+        "parse_json_bytes",
+        "parse_json_bytearray",
+        "parse_json_bytes_with_utf8_chars",
     ],
 )
 def test_resolve_value__happy_path(descriptor, expected_value):

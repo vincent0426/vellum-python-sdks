@@ -27,16 +27,17 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
       })
     );
 
-    statements.push(
-      python.field({
-        name: "method",
-        initializer: this.convertMethodValueToEnum(),
-      })
-    );
-
+    const methodValue = this.convertMethodValueToEnum();
+    if (methodValue.toString() !== "APIRequestMethod.GET") {
+      statements.push(
+        python.field({
+          name: "method",
+          initializer: methodValue,
+        })
+      );
+    }
     const body = this.nodeInputsByKey.get("body");
-
-    if (body) {
+    if (body && body.toString() !== "{}") {
       statements.push(
         python.field({
           name: "json",
@@ -45,12 +46,13 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
       );
     }
 
-    if (this.nodeData.data.additionalHeaders) {
+    const additionalHeaders = this.nodeData.data.additionalHeaders;
+    if (additionalHeaders && additionalHeaders.length > 0) {
       statements.push(
         python.field({
           name: "headers",
           initializer: python.TypeInstantiation.dict(
-            this.nodeData.data.additionalHeaders.map((header) => {
+            additionalHeaders.map((header) => {
               const keyInput = this.nodeData.inputs.find(
                 (input) => input.id === header.headerKeyInputId
               );
@@ -85,13 +87,14 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
       );
     }
 
-    if (this.nodeData.data.apiKeyHeaderKeyInputId) {
+    const apiKeyHeaderKeyInput = this.nodeData.data.apiKeyHeaderKeyInputId;
+    if (apiKeyHeaderKeyInput) {
       const keyInput = this.nodeData.inputs.find(
-        (input) => input.id === this.nodeData.data.apiKeyHeaderKeyInputId
+        (input) => input.id === apiKeyHeaderKeyInput
       );
       if (!keyInput) {
         throw new NodeAttributeGenerationError(
-          `No inputs have api header key id of ${this.nodeData.data.apiKeyHeaderKeyInputId}`
+          `No inputs have api header key id of ${apiKeyHeaderKeyInput}`
         );
       }
       const key = this.nodeInputsByKey.get(keyInput.key);
@@ -437,7 +440,6 @@ export class ApiNode extends BaseSingleFileNode<ApiNodeType, ApiNodeContext> {
         `No method input found for input id ${this.nodeData.data.methodInputId} and of type "CONSTANT_VALUE"`
       );
     }
-
     const methodEnum = methodValue.data.value as string;
 
     return python.reference({

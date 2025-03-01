@@ -512,6 +512,12 @@ export class Workflow {
     return this.workflowContext.workflowRawData.edges;
   }
 
+  private getNodeIds(): Set<string> {
+    return new Set(
+      this.workflowContext.workflowRawData.nodes.map((node) => node.id)
+    );
+  }
+
   private addGraph(workflowClass: python.Class): void {
     if (this.getEdges().length === 0) {
       this.workflowContext.workflowRawData.nodes.forEach((node) => {
@@ -543,9 +549,15 @@ export class Workflow {
       );
 
       const allEdges = this.getEdges();
+      const allNodeIds = this.getNodeIds();
       allEdges.forEach((edge) => {
         if (!usedEdges.has(edge)) {
-          this.unusedEdges.add(edge);
+          if (
+            allNodeIds.has(edge.sourceNodeId) &&
+            allNodeIds.has(edge.targetNodeId)
+          ) {
+            this.unusedEdges.add(edge);
+          }
         }
       });
 
@@ -566,22 +578,11 @@ export class Workflow {
 
   private addUnusedGraphs(workflowClass: python.Class): void {
     // Filter out edges that reference non-existent nodes
-    const remainingUnusedEdges = new Set<WorkflowEdge>();
+    const remainingUnusedEdges = new Set<WorkflowEdge>(this.unusedEdges);
     const remainingUnusedNodes = new Set<WorkflowNode>(this.unusedNodes);
     const remainingUnusedNodesById = Object.fromEntries(
       Array.from(remainingUnusedNodes).map((node) => [node.id, node])
     );
-
-    this.unusedEdges.forEach((edge) => {
-      if (
-        this.workflowContext.globalNodeContextsByNodeId.has(
-          edge.sourceNodeId
-        ) &&
-        this.workflowContext.globalNodeContextsByNodeId.has(edge.targetNodeId)
-      ) {
-        remainingUnusedEdges.add(edge);
-      }
-    });
 
     if (remainingUnusedEdges.size === 0 && remainingUnusedNodes.size === 0) {
       return;

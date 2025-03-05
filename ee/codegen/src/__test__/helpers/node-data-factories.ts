@@ -492,11 +492,13 @@ export function inlinePromptNodeDataInlineVariantFactory({
   errorOutputId,
   parameters,
   defaultBlock,
+  adornments,
 }: {
   blockType?: string;
   errorOutputId?: string;
   parameters?: PromptParameters;
   defaultBlock?: PromptTemplateBlock;
+  adornments?: AdornmentNode[];
 }): PromptNode {
   const block = defaultBlock ?? generateBlockGivenType(blockType ?? "JINJA");
   const nodeData: PromptNode = {
@@ -552,6 +554,8 @@ export function inlinePromptNodeDataInlineVariantFactory({
         },
       },
     ],
+    // Add adornments if provided
+    ...(adornments && { adornments }),
   };
   return nodeData;
 }

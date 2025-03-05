@@ -13,8 +13,10 @@ import {
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
 import { UuidOrString } from "src/generators/uuid-or-string";
+import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { WorkflowProjectGenerator } from "src/project";
 import {
+  AdornmentNode,
   NodeDisplayComment,
   NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
@@ -255,23 +257,70 @@ export abstract class BaseNode<
     });
   }
 
+  protected getAdornments(): AdornmentNode[] {
+    if (this.nodeData.adornments && this.nodeData.adornments.length > 0) {
+      // TODO: Add validation for adornments
+      return this.nodeData.adornments;
+    }
+
+    return [];
+  }
+
   protected getNodeDecorators(): python.Decorator[] | undefined {
-    return this.errorOutputId
-      ? [
+    const decorators: python.Decorator[] = [];
+    const errorOutputId = this.getErrorOutputId();
+
+    if (errorOutputId) {
+      decorators.push(
+        python.decorator({
+          callable: python.invokeMethod({
+            methodReference: python.reference({
+              name: "TryNode",
+              attribute: ["wrap"],
+              modulePath:
+                this.workflowContext.sdkModulePathNames.CORE_NODES_MODULE_PATH,
+            }),
+            arguments_: [],
+          }),
+        })
+      );
+    }
+
+    const adornments = this.getAdornments();
+
+    for (const adornment of adornments) {
+      // TODO: remove this check when we remove errorOutputId
+      if (errorOutputId && adornment.base.name === "TryNode") {
+        continue;
+      }
+
+      if (adornment.base) {
+        decorators.push(
           python.decorator({
             callable: python.invokeMethod({
               methodReference: python.reference({
-                name: "TryNode",
+                name: adornment.base.name,
                 attribute: ["wrap"],
-                modulePath:
-                  this.workflowContext.sdkModulePathNames
-                    .CORE_NODES_MODULE_PATH,
+                modulePath: adornment.base.module,
               }),
-              arguments_: [],
+              arguments_: adornment.attributes.map((attr) =>
+                python.methodArgument({
+                  name: attr.name,
+                  value: new WorkflowValueDescriptor({
+                    workflowValueDescriptor: attr.value,
+                    nodeContext: this.nodeContext,
+                    workflowContext: this.workflowContext,
+                    iterableConfig: { endWithComma: false },
+                  }),
+                })
+              ),
             }),
-          }),
-        ]
-      : undefined;
+          })
+        );
+      }
+    }
+
+    return decorators.length > 0 ? decorators : undefined;
   }
 
   public generateNodeClass(): python.Class {
@@ -312,32 +361,71 @@ export abstract class BaseNode<
 
   public generateNodeDisplayClasses(): python.Class[] {
     const nodeContext = this.nodeContext;
+    const decorators: python.Decorator[] = [];
     const errorOutputId = this.getErrorOutputId();
+
+    if (errorOutputId) {
+      decorators.push(
+        python.decorator({
+          callable: python.invokeMethod({
+            methodReference: python.reference({
+              name: "BaseTryNodeDisplay",
+              attribute: ["wrap"],
+              modulePath:
+                this.workflowContext.sdkModulePathNames
+                  .NODE_DISPLAY_MODULE_PATH,
+            }),
+            arguments_: [
+              new MethodArgument({
+                name: "error_output_id",
+                value: python.TypeInstantiation.uuid(errorOutputId),
+              }),
+            ],
+          }),
+        })
+      );
+    }
+    const adornments = this.getAdornments();
+
+    for (const adornment of adornments) {
+      // TODO: remove this check when we remove errorOutputId
+      if (errorOutputId && adornment.base.name === "TryNode") {
+        continue;
+      }
+
+      if (adornment.base) {
+        decorators.push(
+          python.decorator({
+            callable: python.invokeMethod({
+              methodReference: python.reference({
+                name: `Base${adornment.base.name}Display`,
+                attribute: ["wrap"],
+                modulePath:
+                  this.workflowContext.sdkModulePathNames
+                    .NODE_DISPLAY_MODULE_PATH,
+              }),
+              arguments_: adornment.attributes.map(
+                (attr) =>
+                  new MethodArgument({
+                    name: attr.name,
+                    value: new WorkflowValueDescriptor({
+                      workflowValueDescriptor: attr.value,
+                      nodeContext: this.nodeContext,
+                      workflowContext: this.workflowContext,
+                      iterableConfig: { endWithComma: false },
+                    }),
+                  })
+              ),
+            }),
+          })
+        );
+      }
+    }
 
     const nodeClass = python.class_({
       name: nodeContext.nodeDisplayClassName,
       extends_: [this.getNodeDisplayBaseClass()],
-      decorators: errorOutputId
-        ? [
-            python.decorator({
-              callable: python.invokeMethod({
-                methodReference: python.reference({
-                  name: "BaseTryNodeDisplay",
-                  attribute: ["wrap"],
-                  modulePath:
-                    this.workflowContext.sdkModulePathNames
-                      .NODE_DISPLAY_MODULE_PATH,
-                }),
-                arguments_: [
-                  new MethodArgument({
-                    name: "error_output_id",
-                    value: python.TypeInstantiation.uuid(errorOutputId),
-                  }),
-                ],
-              }),
-            }),
-          ]
-        : undefined,
+      decorators: decorators.length > 0 ? decorators : undefined,
     });
 
     this.getNodeDisplayClassBodyStatements().forEach((statement) =>

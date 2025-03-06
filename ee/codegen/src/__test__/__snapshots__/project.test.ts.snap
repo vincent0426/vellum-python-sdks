@@ -71,6 +71,17 @@ baz = foo + bar
 "
 `;
 
+exports[`WorkflowProjectGenerator > combinator normalization > should normalize AND to OR combinators 1`] = `
+"from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+
+class FinalOutput(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = 3
+"
+`;
+
 exports[`WorkflowProjectGenerator > failure cases > should generate code even if a node fails to find invalid ports and target nodes 1`] = `
 "from vellum.workflows.nodes.displayable import TemplatingNode
 from vellum.workflows.state import BaseState

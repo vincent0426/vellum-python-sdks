@@ -1,4 +1,3 @@
-import pytest
 from uuid import UUID
 from typing import Dict
 
@@ -231,11 +230,7 @@ def test_vellum_workflow_display__serialize_with_unused_nodes_and_edges():
     assert edge_found, "Edge between unused nodes NodeB and NodeC not found in serialized output"
 
 
-def test_parse_json_not_supported_in_ui():
-    """
-    Test that verifies ParseJsonExpression is not yet supported in the UI.
-    This test should fail once UI support is added, at which point it should be updated.
-    """
+def test_vellum_workflow_display__serialize_with_parse_json_expression():
     # GIVEN a workflow that uses the parse_json function
     from vellum.workflows.references.constant import ConstantValueReference
 
@@ -249,13 +244,55 @@ def test_parse_json_not_supported_in_ui():
         class Outputs(BaseWorkflow.Outputs):
             final = JsonNode.Outputs.json_result
 
-    # WHEN we attempt to serialize it
+    # AND a display class for this workflow
     workflow_display = get_workflow_display(
         base_display_class=VellumWorkflowDisplay,
         workflow_class=Workflow,
     )
 
-    with pytest.raises(ValueError) as exc_info:
-        workflow_display.serialize()
+    # WHEN we serialize the workflow
+    exec_config = workflow_display.serialize()
 
-    assert "ParseJsonExpression is not supported in the UI" == str(exc_info.value)
+    # THEN the serialized workflow contains the parse_json expression
+    raw_data = exec_config["workflow_raw_data"]
+    assert isinstance(raw_data, dict)
+
+    nodes = raw_data["nodes"]
+    assert isinstance(nodes, list)
+
+    json_node = None
+    for node in nodes:
+        assert isinstance(node, dict)
+        definition = node.get("definition")
+        if node.get("type") == "GENERIC" and isinstance(definition, dict) and definition.get("name") == "JsonNode":
+            json_node = node
+            break
+
+    assert json_node is not None
+
+    outputs = json_node.get("outputs", [])
+    assert isinstance(outputs, list)
+
+    json_result = None
+    for output in outputs:
+        assert isinstance(output, dict)
+        if output.get("name") == "json_result":
+            json_result = output
+            break
+
+    assert json_result == {
+        "id": "44c7d94c-a76a-4151-9b95-85a31764f18f",
+        "name": "json_result",
+        "type": "JSON",
+        "value": {
+            "type": "UNARY_EXPRESSION",
+            "lhs": {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                    "type": "STRING",
+                    "value": '{"key": "value"}',
+                },
+            },
+            "operator": "parseJson",
+        },
+    }

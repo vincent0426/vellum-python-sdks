@@ -326,6 +326,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 IsNotNilExpression,
                 IsUndefinedExpression,
                 IsNotUndefinedExpression,
+                ParseJsonExpression,
             ),
         ):
             lhs = self.serialize_value(display_context, condition._expression)
@@ -402,9 +403,6 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 "type": "EXECUTION_COUNTER",
                 "node_id": str(node_class_display.node_id),
             }
-
-        if isinstance(value, ParseJsonExpression):
-            raise ValueError("ParseJsonExpression is not supported in the UI")
 
         if not isinstance(value, BaseDescriptor):
             vellum_value = primitive_to_vellum_value(value)

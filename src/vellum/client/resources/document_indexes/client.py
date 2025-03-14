@@ -10,7 +10,6 @@ from json.decoder import JSONDecodeError
 from ...core.api_error import ApiError
 from ...types.document_index_indexing_config_request import DocumentIndexIndexingConfigRequest
 from ...types.entity_status import EntityStatus
-from ...types.environment_enum import EnvironmentEnum
 from ...types.document_index_read import DocumentIndexRead
 from ...core.serialization import convert_and_respect_annotation_metadata
 from ...core.jsonable_encoder import jsonable_encoder
@@ -108,7 +107,6 @@ class DocumentIndexesClient:
         name: str,
         indexing_config: DocumentIndexIndexingConfigRequest,
         status: typing.Optional[EntityStatus] = OMIT,
-        environment: typing.Optional[EnvironmentEnum] = OMIT,
         copy_documents_from_index_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DocumentIndexRead:
@@ -130,13 +128,6 @@ class DocumentIndexesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
-
-        environment : typing.Optional[EnvironmentEnum]
-            The environment this document index is used in
-
-            * `DEVELOPMENT` - Development
-            * `STAGING` - Staging
-            * `PRODUCTION` - Production
 
         copy_documents_from_index_id : typing.Optional[str]
             Optionally specify the id of a document index from which you'd like to copy and re-index its documents into this newly created index
@@ -191,7 +182,6 @@ class DocumentIndexesClient:
                 "label": label,
                 "name": name,
                 "status": status,
-                "environment": environment,
                 "indexing_config": convert_and_respect_annotation_metadata(
                     object_=indexing_config, annotation=DocumentIndexIndexingConfigRequest, direction="write"
                 ),
@@ -268,7 +258,6 @@ class DocumentIndexesClient:
         *,
         label: str,
         status: typing.Optional[EntityStatus] = OMIT,
-        environment: typing.Optional[EnvironmentEnum] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DocumentIndexRead:
         """
@@ -287,13 +276,6 @@ class DocumentIndexesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
-
-        environment : typing.Optional[EnvironmentEnum]
-            The environment this document index is used in
-
-            * `DEVELOPMENT` - Development
-            * `STAGING` - Staging
-            * `PRODUCTION` - Production
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -322,7 +304,6 @@ class DocumentIndexesClient:
             json={
                 "label": label,
                 "status": status,
-                "environment": environment,
             },
             request_options=request_options,
             omit=OMIT,
@@ -388,7 +369,6 @@ class DocumentIndexesClient:
         *,
         label: typing.Optional[str] = OMIT,
         status: typing.Optional[EntityStatus] = OMIT,
-        environment: typing.Optional[EnvironmentEnum] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DocumentIndexRead:
         """
@@ -407,13 +387,6 @@ class DocumentIndexesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
-
-        environment : typing.Optional[EnvironmentEnum]
-            The environment this document index is used in
-
-            * `DEVELOPMENT` - Development
-            * `STAGING` - Staging
-            * `PRODUCTION` - Production
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -441,7 +414,6 @@ class DocumentIndexesClient:
             json={
                 "label": label,
                 "status": status,
-                "environment": environment,
             },
             request_options=request_options,
             omit=OMIT,
@@ -651,7 +623,6 @@ class AsyncDocumentIndexesClient:
         name: str,
         indexing_config: DocumentIndexIndexingConfigRequest,
         status: typing.Optional[EntityStatus] = OMIT,
-        environment: typing.Optional[EnvironmentEnum] = OMIT,
         copy_documents_from_index_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DocumentIndexRead:
@@ -673,13 +644,6 @@ class AsyncDocumentIndexesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
-
-        environment : typing.Optional[EnvironmentEnum]
-            The environment this document index is used in
-
-            * `DEVELOPMENT` - Development
-            * `STAGING` - Staging
-            * `PRODUCTION` - Production
 
         copy_documents_from_index_id : typing.Optional[str]
             Optionally specify the id of a document index from which you'd like to copy and re-index its documents into this newly created index
@@ -742,7 +706,6 @@ class AsyncDocumentIndexesClient:
                 "label": label,
                 "name": name,
                 "status": status,
-                "environment": environment,
                 "indexing_config": convert_and_respect_annotation_metadata(
                     object_=indexing_config, annotation=DocumentIndexIndexingConfigRequest, direction="write"
                 ),
@@ -827,7 +790,6 @@ class AsyncDocumentIndexesClient:
         *,
         label: str,
         status: typing.Optional[EntityStatus] = OMIT,
-        environment: typing.Optional[EnvironmentEnum] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DocumentIndexRead:
         """
@@ -846,13 +808,6 @@ class AsyncDocumentIndexesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
-
-        environment : typing.Optional[EnvironmentEnum]
-            The environment this document index is used in
-
-            * `DEVELOPMENT` - Development
-            * `STAGING` - Staging
-            * `PRODUCTION` - Production
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -889,7 +844,6 @@ class AsyncDocumentIndexesClient:
             json={
                 "label": label,
                 "status": status,
-                "environment": environment,
             },
             request_options=request_options,
             omit=OMIT,
@@ -963,7 +917,6 @@ class AsyncDocumentIndexesClient:
         *,
         label: typing.Optional[str] = OMIT,
         status: typing.Optional[EntityStatus] = OMIT,
-        environment: typing.Optional[EnvironmentEnum] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DocumentIndexRead:
         """
@@ -982,13 +935,6 @@ class AsyncDocumentIndexesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
-
-        environment : typing.Optional[EnvironmentEnum]
-            The environment this document index is used in
-
-            * `DEVELOPMENT` - Development
-            * `STAGING` - Staging
-            * `PRODUCTION` - Production
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1024,7 +970,6 @@ class AsyncDocumentIndexesClient:
             json={
                 "label": label,
                 "status": status,
-                "environment": environment,
             },
             request_options=request_options,
             omit=OMIT,

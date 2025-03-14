@@ -5,7 +5,6 @@ import datetime as dt
 import pydantic
 import typing
 from .entity_status import EntityStatus
-from .environment_enum import EnvironmentEnum
 from .document_index_indexing_config import DocumentIndexIndexingConfig
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
@@ -29,15 +28,6 @@ class DocumentIndexRead(UniversalBaseModel):
     
     * `ACTIVE` - Active
     * `ARCHIVED` - Archived
-    """
-
-    environment: typing.Optional[EnvironmentEnum] = pydantic.Field(default=None)
-    """
-    The environment this document index is used in
-    
-    * `DEVELOPMENT` - Development
-    * `STAGING` - Staging
-    * `PRODUCTION` - Production
     """
 
     indexing_config: DocumentIndexIndexingConfig
